@@ -43,7 +43,7 @@ OPERATOR_VERILERI = {
     "emirhan.s": {"password": "fotmemirhan", "name": "Emirhan Şenel", "photo": "emirhansenel.jpg"},
     "mustafa.d": {"password": "fotmmustafa", "name": "Mustafa Can Demir", "photo": "mustafacandemir.jpg"},
     "kariyer.k": {"password": "1234", "name": "Kariyer", "photo": "1.png"},
-     "serkan.m": {"password": "1234", "name": "Serkan Mutlu", "photo": "1.png"},
+     "serkan.m": {"password": "123456", "name": "Serkan Mutlu", "photo": "1.png"},
 }
 
 @app.post("/api/login")
