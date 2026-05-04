@@ -22,7 +22,8 @@
         .login-box { background-color: var(--card-bg); padding: 40px; border-radius: 12px; width: 90%; max-width: 480px; text-align: center; box-shadow: var(--shadow); border: 2px solid var(--border); }
         .login-logo { height: 110px; margin-bottom: 20px; object-fit: contain; }
         .login-input { width: 100%; padding: 15px; margin-bottom: 15px; border: 2px solid var(--border); border-radius: 6px; font-size: 1.1em; text-transform: uppercase; }
-        .login-btn { width: 100%; padding: 15px; background-color: var(--primary-gray); color: white; border: none; border-radius: 6px; font-size: 1.3em; font-weight: 700; cursor: pointer; }
+        .login-btn { width: 100%; padding: 15px; background-color: var(--primary-gray); color: white; border: none; border-radius: 6px; font-size: 1.3em; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .login-btn:hover { filter: brightness(0.9); }
 
         /* HEADER & LOGOLAR */
         header { background-color: var(--card-bg); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--primary-gray); box-shadow: var(--shadow); position: sticky; top: 0; z-index: 1000; }
@@ -49,19 +50,24 @@
         th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; font-weight: 700; font-size: 0.9em; }
         th { background: #f8f8f8; color: #555; }
 
-        /* VİDEO KUTUSU (KAMERA İÇİN) */
+        /* VİDEO KUTUSU (KAMERA) */
         .video-box { width: 100%; height: 450px; background: #000; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; position: relative; overflow: hidden; }
         #webcam-video { width: 100%; height: 100%; object-fit: cover; display: none; }
 
-        /* MODAL (MAKİNEYE TIKLANINCA AÇILAN KUTU) */
+        /* MODAL EKRANLARI */
         #m-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 95vw; max-width: 700px; background: white; z-index: 9000; padding: 30px; border-radius: 12px; border: 3px solid var(--border); box-shadow: 0 0 150px rgba(0,0,0,0.8); }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 8500; }
+
+        /* İSTASYON KARTLARI (Tıklanabilir Harita İçin) */
+        .st-card { padding: 15px; background: #f8f8f8; border: 2px solid var(--primary-gray); border-radius: 10px; cursor: pointer; text-align: center; transition: 0.3s; }
+        .st-card:hover { border-color: var(--danger); transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .st-card h4 { margin-bottom: 5px; font-size: 1.1em; font-weight: 900; }
 
         /* DURUŞ YÖNETİMİ BUTONLARI */
         .dt-step { display: none; }
         .dt-step.active { display: block; }
         .dt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .dt-btn { padding: 20px; font-weight: 900; cursor: pointer; border: 2px solid var(--border); border-radius: 8px; color: white; font-size: 1.1em; transition: 0.2s; }
+        .dt-btn { padding: 15px; font-weight: 900; cursor: pointer; border: 2px solid var(--border); border-radius: 8px; color: white; font-size: 1.1em; transition: 0.2s; }
         .dt-btn:active { transform: scale(0.95); }
 
         /* --- MOBİL YAN EKRAN (LANDSCAPE) UYUMU --- */
@@ -71,9 +77,7 @@
             .clock-box { font-size: 1.1em; padding: 2px 10px; }
             .operator-photo { width: 45px; height: 45px; }
             .header-slogan { display: none; }
-            
             .tab-btn { padding: 8px 15px; font-size: 0.75em; }
-            
             .dashboard-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 10px; }
             .card { padding: 12px; margin-bottom: 10px; }
             .card h3 { font-size: 0.85em; margin-bottom: 8px; }
@@ -153,19 +157,19 @@
                     <h3>İŞ EMİRLERİ LİSTESİ</h3>
                     <table><thead><tr><th>No</th><th>Ürün</th><th>Durum</th><th>Başlangıç</th><th>Hedef</th><th>Üretilen</th><th>Kalite %</th></tr></thead>
                     <tbody>
-                        <tr><td>#7822</td><td>PLC ANA KASA</td><td><span style="color:green">AKTİF</span></td><td>08:00</td><td>2500</td><td id="wo-p">0</td><td>%99.5</td></tr>
+                        <tr><td>#7822</td><td>PLC ANA KASA</td><td><span style="color:green; font-weight:bold;">AKTİF ÜRETİM</span></td><td>08:00</td><td>2500</td><td id="wo-p" style="font-weight:900; color:var(--danger);">0</td><td id="wo-q">%99.5</td></tr>
                         <tr><td>#7825</td><td>SENSÖR PANEL</td><td>BEKLEYEN</td><td>14:30</td><td>1200</td><td>0</td><td>-</td></tr>
                         <tr><td>#7820</td><td>GÜÇ ÜNİTESİ</td><td>TAMAMLANDI</td><td>04:00</td><td>1000</td><td>1000</td><td>%98.8</td></tr>
                     </tbody></table>
                 </div>
             </div>
 
-            <!-- 3. İSTASYON İZLEME (TABLO + TIKLANABİLİR HARİTA) -->
+            <!-- 3. İSTASYON İZLEME -->
             <div id="t2" class="tab-content" style="display:none;">
                 <div class="dashboard-grid">
                     <div class="card">
-                        <h3>GÖRSEL İSTASYON HARİTASI (TIKLAYIN)</h3>
-                        <div id="machine-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:15px;"></div>
+                        <h3>GÖRSEL İSTASYON HARİTASI</h3>
+                        <div id="machine-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:15px;"></div>
                     </div>
                     <div class="card">
                         <h3>ANLIK VERİ TABLOSU</h3>
@@ -177,9 +181,23 @@
             <!-- 4. DURUŞ YÖNETİMİ -->
             <div id="t3" class="tab-content" style="display:none;">
                 <div class="card" style="max-width: 800px; margin: 0 auto;">
-                    <div id="ds1" class="dt-step active"><h3>1. ADIM: İSTASYON SEÇİN</h3><div class="dt-grid" id="dt-st-list"></div></div>
-                    <div id="ds2" class="dt-step"><h3>2. ADIM: DURUŞ TİPİ SEÇİN (<span id="dt-sel-st"></span>)</h3><div class="dt-grid"><button class="dt-btn" style="background:var(--warning);" onclick="goDt3('Planlı')">PLANLI DURUŞ</button><button class="dt-btn" style="background:var(--danger);" onclick="goDt3('Plansız')">PLANSIZ DURUŞ</button></div></div>
-                    <div id="ds3" class="dt-step"><h3>3. ADIM: DURUŞ SEBEBİ</h3><div id="dt-reasons" class="dt-grid"></div></div>
+                    <div id="ds1" class="dt-step active">
+                        <h3>1. ADIM: İSTASYON SEÇİN</h3>
+                        <div class="dt-grid" id="dt-st-list"></div>
+                    </div>
+                    <div id="ds2" class="dt-step">
+                        <h3>2. ADIM: DURUŞ TİPİ SEÇİN (<span id="dt-sel-st"></span>)</h3>
+                        <div class="dt-grid">
+                            <button class="dt-btn" style="background:var(--warning);" onclick="goDt3('Planlı')">PLANLI DURUŞ</button>
+                            <button class="dt-btn" style="background:var(--danger);" onclick="goDt3('Plansız')">PLANSIZ DURUŞ</button>
+                        </div>
+                        <button class="login-btn" style="margin-top:20px; background:var(--primary-gray);" onclick="$('#ds2').removeClass('active'); $('#ds1').addClass('active');">⬅ İPTAL / GERİ</button>
+                    </div>
+                    <div id="ds3" class="dt-step">
+                        <h3>3. ADIM: DURUŞ SEBEBİ</h3>
+                        <div id="dt-reasons" class="dt-grid"></div>
+                        <button class="login-btn" style="margin-top:20px; background:var(--primary-gray);" onclick="$('#ds3').removeClass('active'); $('#ds2').addClass('active');">⬅ GERİ</button>
+                    </div>
                     <div id="ds4" class="dt-step">
                         <h2 style="color:var(--danger); text-align:center;">MAKİNE DURDURULDU</h2>
                         <h1 id="dt-timer" style="font-size:5em; text-align:center; font-family:monospace; margin:20px 0;">00:00:00</h1>
@@ -201,20 +219,26 @@
                 </div>
             </div>
 
-            <!-- 6. ENERJİ & ANALİZ (BAR VE PASTA GRAFİK) -->
+            <!-- 6. ENERJİ & ANALİZ -->
             <div id="t4" class="tab-content" style="display:none;">
                 <div class="dashboard-grid">
                     <div class="card" style="grid-column: span 2;">
                         <h3>ENERJİ TÜKETİMİ & RAPORLAMA</h3>
                         <div style="margin-bottom:15px; display:flex; gap:10px;">
-                            <select id="range" style="padding:10px; border-radius:5px;"><option value="3">Son 3 Ay</option><option value="6">Son 6 Ay</option></select>
+                            <select id="range" style="padding:10px; border-radius:5px; font-weight:bold;" onchange="updateEnergyChart()">
+                                <option value="1">Son 1 Ay</option>
+                                <option value="3" selected>Son 3 Ay</option>
+                                <option value="6">Son 6 Ay</option>
+                                <option value="12">Son 1 Yıl</option>
+                                <option value="all">Tüm Zamanlar</option>
+                            </select>
                             <button onclick="exportExcel()" style="background:#1d6f42; color:white; border:none; padding:10px 20px; border-radius:5px; font-weight:900; cursor:pointer;">EXCEL'E AKTAR</button>
                         </div>
                         <canvas id="chart-energy" height="100"></canvas>
                     </div>
                     <div class="card">
-                        <h3>OEE DAĞILIMI (PASTA GRAFİK)</h3>
-                        <canvas id="chart-oee-pie"></canvas>
+                        <h3>OEE TRENDİ</h3>
+                        <canvas id="chart-oee-trend"></canvas>
                     </div>
                 </div>
             </div>
@@ -222,7 +246,7 @@
             <!-- 7. AI KAMERA -->
             <div id="t5" class="tab-content" style="display:none;">
                 <div class="card">
-                    <h3>AI KALİTE DENETİMİ (KAMERA BAĞLANTISI)</h3>
+                    <h3>AI KALİTE DENETİMİ</h3>
                     <div style="margin-bottom:15px; display:flex; gap:10px;">
                         <select id="cam-sel" style="flex:1; padding:15px; border:2px solid var(--border); font-weight:bold; border-radius:6px;"></select>
                         <button onclick="startCam()" style="background:var(--danger); color:white; padding:0 30px; border:none; border-radius:6px; font-weight:900; cursor:pointer;">KAMERAYI AÇ</button>
@@ -236,7 +260,7 @@
         </main>
     </div>
 
-    <!-- TIKLANABİLİR MAKİNE MODALI -->
+    <!-- TIKLANABİLİR MAKİNE MODALI (GERİ BUTONLU) -->
     <div class="overlay" onclick="closeM()"></div>
     <div id="m-modal">
         <h2 id="modal-name" style="margin-bottom: 20px; border-bottom: 2px solid #ccc; padding-bottom:10px;">İstasyon Analizi</h2>
@@ -251,12 +275,13 @@
                 <p>kW/h</p>
             </div>
         </div>
-        <button class="login-btn" style="width:100%; margin-top:25px; background:var(--border);" onclick="closeM()">ANALİZİ KAPAT</button>
+        <!-- GERİ DÖN TUŞU EKLENDİ -->
+        <button class="login-btn" style="width:100%; margin-top:25px; background:var(--border);" onclick="closeM()">⬅ GERİ DÖN</button>
     </div>
 
-    <!-- JAVASCRIPT FONKSİYONLARI (TÜMÜ EKSİKSİZ) -->
+    <!-- JAVASCRIPT -->
     <script>
-        let running = true, pCount = 0, dCount = 0, dtStart = null, dtInt = null, ws = null, selSt = "";
+        let running = true, pCount = 0, dCount = 0, dtStart = null, dtInt = null, ws = null, selSt = "", eChart, oChart;
         let machines = [
             {id:'M1', n:'Pres 1', o:88, p:42},
             {id:'M2', n:'Montaj A', o:92, p:12},
@@ -266,7 +291,7 @@
             {id:'M6', n:'Kalite Kontrol', o:99, p:2}
         ];
 
-        // 1. GİRİŞ İŞLEMİ
+        // GİRİŞ İŞLEMİ
         async function login() {
             const u = $('#username').val().toLowerCase().trim(), p = $('#password').val().trim();
             try {
@@ -277,7 +302,7 @@
                 if(res.ok) { 
                     $('#login-modal').fadeOut(); $('#main-dashboard').fadeIn(); 
                     $('#op-name').text(data.name); $('#op-img').attr('src', data.photo); 
-                    init(); // Sistemi başlat
+                    init(); 
                 } else { 
                     $('#login-error').fadeIn().text("Kullanıcı adı veya şifre hatalı!"); 
                 }
@@ -286,33 +311,26 @@
             }
         }
 
-        // 2. SEKMELER ARASI GEÇİŞ
         function tab(e, id) { 
-            $('.tab-content').hide(); 
-            $('.tab-btn').removeClass('active'); 
-            $('#'+id).show(); 
-            if(e) $(e.currentTarget).addClass('active'); 
+            $('.tab-content').hide(); $('.tab-btn').removeClass('active'); 
+            $('#'+id).show(); if(e) $(e.currentTarget).addClass('active'); 
         }
 
-        // 3. CANLI LOG EKLEME
         function addLog(m, cls) { 
             const t = new Date().toLocaleTimeString(); 
             $('#log-list').prepend(`<div style="color:${cls}; border-bottom:1px solid #ddd; padding:8px;">[${t}] ${m}</div>`); 
         }
 
-        // 4. MAKİNE MODALI AÇ/KAPAT
+        // MODAL (GERİ DÖN TUŞUYLA KAPATILIYOR)
         function openM(id) { 
             const m = machines.find(x => x.id === id); 
             $('#modal-name').text(m.n + " Anlık Verileri"); 
-            $('#m-oee').text('%' + m.o); 
-            $('#m-p').text(m.p); 
+            $('#m-oee').text('%' + m.o); $('#m-p').text(m.p); 
             $('.overlay, #m-modal').fadeIn(); 
         }
-        function closeM() { 
-            $('.overlay, #m-modal').fadeOut(); 
-        }
+        function closeM() { $('.overlay, #m-modal').fadeOut(); }
 
-        // 5. DURUŞ YÖNETİMİ ADIMLARI
+        // DURUŞ YÖNETİMİ
         function goDtStep2(n) { 
             selSt = n; $('#dt-sel-st').text(n); 
             $('#ds1').removeClass('active'); $('#ds2').addClass('active'); 
@@ -345,7 +363,7 @@
             addLog(`${selSt} TEKRAR DEVREYE ALINDI`, 'green'); 
         }
 
-        // 6. KAMERA FONKSİYONLARI (DÜZELTİLDİ)
+        // KAMERA FONKSİYONLARI
         async function listCams() { 
             try {
                 const devs = await navigator.mediaDevices.enumerateDevices(); 
@@ -362,13 +380,24 @@
             try {
                 const s = await navigator.mediaDevices.getUserMedia({video:{deviceId:{exact:$('#cam-sel').val()}}}); 
                 const v = document.getElementById('webcam-video');
-                v.srcObject = s; 
-                v.style.display = 'block';
-                $('#cam-text').hide(); // Bekleniyor yazısını gizle
-            } catch(e) { alert("Kamera açılamadı! Tarayıcı izinlerini kontrol edin."); }
+                v.srcObject = s; v.style.display = 'block'; $('#cam-text').hide(); 
+            } catch(e) { alert("Kamera açılamadı!"); }
         }
 
-        // 7. EXCEL ÇIKTISI
+        // ENERJİ GRAFİĞİ DİNAMİK GÜNCELLEME (Seçeneğe Göre Uzayan Veri)
+        function updateEnergyChart() {
+            let val = $('#range').val();
+            let count = val === 'all' ? 24 : parseInt(val); // Tümü seçilirse 24 veri bas
+            let labels = [], data = [];
+            for(let i = 1; i <= count; i++) {
+                labels.push(i + '. Periyot');
+                data.push(Math.floor(Math.random() * 300) + 200);
+            }
+            eChart.data.labels = labels;
+            eChart.data.datasets[0].data = data;
+            eChart.update();
+        }
+
         function exportExcel() { 
             let csv = "Tarih,Istasyon,Enerji (kW/h),OEE (%)\n"; 
             machines.forEach(m => csv += `2026-05-04,${m.n},${m.p},${m.o}\n`); 
@@ -378,57 +407,64 @@
             a.href = u; a.download = `MES_Rapor_${new Date().getTime()}.csv`; a.click(); 
         }
 
-        // 8. SİSTEMİ BAŞLATMA (INIT)
         function init() {
             // Saat
             setInterval(() => { $('#live-clock').text(new Date().toLocaleTimeString()); }, 1000);
             
-            // İstasyonları Tabloya, Görsel Haritaya ve Duruş Menüsüne Ekleme
+            // İstasyonlar (Detaylı Kartlar)
             const mBody = $('#m-table-body'), mList = $('#machine-list'), dtList = $('#dt-st-list');
             machines.forEach(m => {
-                // Tablo (T2)
                 mBody.append(`<tr><td>${m.n}</td><td>Aktif</td><td>%${m.o}</td><td>${m.p}</td></tr>`);
-                // Görsel Harita Tıklanabilir Butonları (T2)
-                $('<button>').css({padding:'20px', background:'#f8f8f8', border:'2px solid var(--primary-gray)', borderRadius:'10px', fontWeight:'900', cursor:'pointer', fontSize:'1.1em', transition:'0.3s'})
-                    .hover(function(){$(this).css('border-color','var(--danger)')}, function(){$(this).css('border-color','var(--primary-gray)')})
-                    .text(m.n).click(() => openM(m.id)).appendTo(mList);
-                // Duruş Listesi Butonları (T3)
+                
+                // Görsel Harita Kartları (OEE ve Güç Verisi İçinde)
+                $('<div class="st-card">')
+                    .html(`<h4 style="color:var(--border);">${m.n}</h4><span style="color:var(--success); font-size:0.8em; font-weight:900;">● Çevrimiçi</span><br><br><small style="font-weight:700;">OEE: %${m.o}</small><br><small style="font-weight:700;">Güç: ${m.p} kW/h</small>`)
+                    .click(() => openM(m.id)).appendTo(mList);
+                
                 $('<button>').addClass('dt-btn').css('background','#555').text(m.n).click(() => goDtStep2(m.n)).appendTo(dtList);
             });
 
-            // Canlı Üretim Simülasyonu
+            // YAVAŞLATILMIŞ VE İŞ EMRİNE BAĞLANMIŞ SAYAÇ (8 Saniyede Bir Artar)
             setInterval(() => { 
                 if(!running) return; 
-                pCount++; 
-                if(Math.random()>0.97) dCount++; 
-                $('#kpi-p, #wo-p').text(pCount); 
+                pCount += Math.floor(Math.random() * 3) + 1; 
+                if(Math.random()>0.85) dCount++; 
+                
+                let oee = (pCount>0 ? ((pCount-dCount)/pCount*100).toFixed(1) : 88);
+                
+                // Anasayfa güncelleniyor
+                $('#kpi-p').text(pCount); 
                 $('#kpi-d').text(dCount); 
-                $('#kpi-o').text('%'+(pCount>0?((pCount-dCount)/pCount*100).toFixed(1):88)); 
-            }, 3000);
+                $('#kpi-o').text('%' + oee); 
+                
+                // İŞ EMRİ LİSTESİ BİREBİR GÜNCELLENİYOR (Bağlantı Kuruldu)
+                $('#wo-p').text(pCount); 
+                $('#wo-q').text('%' + oee);
+            }, 8000);
 
-            // Grafik 1: Enerji Bar Grafiği (T4)
-            new Chart(document.getElementById('chart-energy'), {
-                type:'bar', 
-                data:{labels:['Mart','Nisan','Mayıs'], datasets:[{label:'Tüketim (kW/h)', data:[450,520,380], backgroundColor:'#b2b2b2'}]}
-            });
-
-            // Grafik 2: OEE Pasta Grafiği (T4)
-            new Chart(document.getElementById('chart-oee-pie'), {
-                type:'doughnut',
-                data:{
-                    labels: machines.slice(0,4).map(m=>m.n), // İlk 4 makineyi örnek olarak al
-                    datasets:[{data: machines.slice(0,4).map(m=>m.o), backgroundColor: ['#16a34a', '#d97706', '#df2311', '#555']}]
+            // Çizgi (Trend) OEE Grafiği Geri Geldi
+            oChart = new Chart(document.getElementById('chart-oee-trend'), {
+                type: 'line',
+                data: {
+                    labels: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum'],
+                    datasets: [{ label: 'Hat OEE % Trendi', data: [82, 85, 84, 89, 92], borderColor: '#df2311', fill: false }]
                 }
             });
 
-            // WebSocket ve Kamera Başlatma
+            // Enerji Bar Grafiği
+            eChart = new Chart(document.getElementById('chart-energy'), {
+                type: 'bar',
+                data: { labels: ['1. Periyot', '2. Periyot', '3. Periyot'], datasets: [{ label: 'Tüketim (kW/h)', data: [450, 520, 380], backgroundColor: '#b2b2b2' }] }
+            });
+
+            // WebSocket
             try {
                 ws = new WebSocket('wss://meskariyergunu.onrender.com/ws'); 
                 ws.onmessage = (e) => { const d = JSON.parse(e.data); addLog(d.payload.log_message, d.type==='error_event'?'red':'green'); };
                 ws.onclose = () => setTimeout(() => { ws = new WebSocket('wss://meskariyergunu.onrender.com/ws'); }, 5000);
-            } catch(e) { console.log("Canlı veri bağlantısı koptu."); }
+            } catch(e) { console.log("Canlı veri koptu."); }
             
-            listCams(); // Kameraları listeye çek
+            listCams(); 
         }
     </script>
 </body>
