@@ -17,7 +17,9 @@ except Exception:
     yolo_model = None
 
 app = FastAPI()
-
+@app.get("/")
+async def root():
+    return {"mesaj": "FOT-M MES Sistemi Sunucusu Aktif", "durum": "OK"}
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://meskariyergunu.vercel.app"], 
