@@ -22,7 +22,7 @@ async def root():
     return {"mesaj": "FOT-M MES Sistemi Sunucusu Aktif", "durum": "OK"}
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://meskariyergunu.vercel.app"], 
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
