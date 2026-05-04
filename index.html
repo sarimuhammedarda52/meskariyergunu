@@ -180,3 +180,63 @@
     </script>
 </body>
 </html>
+<script>
+    let running = true, pCount = 0, dCount = 0, dtStart = null, dtInt = null, ws = null, nNum = 0, selSt = "", eChart, oChart;
+    let machines = [{id:'M1', n:'Pres 1', o:88, p:42},{id:'M2', n:'Montaj A', o:92, p:12},{id:'M3', n:'CNC 1', o:85, p:8},{id:'M4', n:'Robot 1', o:78, p:15},{id:'M5', n:'Lazer', o:95, p:110},{id:'M6', n:'Abkant', o:89, p:25},{id:'M7', n:'Boya', o:78, p:160},{id:'M8', n:'Test', o:98, p:5},{id:'M9', n:'CNC 2', o:85, p:8},{id:'M10', n:'Sevkiyat', o:90, p:12},{id:'M11', n:'Hidrolik', o:84, p:55},{id:'M12', n:'Kalite', o:99, p:1}];
+
+    // GİRİŞ FONKSİYONU (RENDER BAĞLANTILI)
+    async function login() {
+        const u = $('#username').val().toLowerCase().trim();
+        const p = $('#password').val().trim();
+        try {
+            // Render adresini buraya sabitledim
+            const res = await fetch('https://meskariyergunu.onrender.com/api/login', {
+                method:'POST', 
+                headers:{'Content-Type':'application/json'}, 
+                body:JSON.stringify({username:u, password:p})
+            });
+            const data = await res.json();
+            if(res.ok) { 
+                $('#login-modal').fadeOut(); 
+                $('#main-dashboard').fadeIn(); 
+                $('#op-name').text(data.name); 
+                $('#op-img').attr('src', data.photo); 
+                init(); 
+            } else { 
+                $('#login-error').fadeIn().text("Kullanıcı adı veya şifre hatalı!"); 
+            }
+        } catch(e) { 
+            $('#login-error').fadeIn().text("Sunucuya ulaşılamıyor (Render uyanıyor olabilir)!"); 
+        }
+    }
+
+    // CANLI VERİ (WEBSOCKET) BAĞLANTISI
+    function connectWS() { 
+        // İnternet üzerinden güvenli bağlantı için wss kullanıyoruz
+        ws = new WebSocket('wss://meskariyergunu.onrender.com/ws'); 
+        ws.onmessage = (e) => { 
+            const d = JSON.parse(e.data); 
+            addLog(d.payload.log_message, d.type === 'error_event' ? 'red' : 'green'); 
+        }; 
+        ws.onclose = () => { setTimeout(connectWS, 5000); }; // Bağlantı koparsa 5sn sonra tekrar dene
+    }
+
+    // DİĞER FONKSİYONLAR
+    function tab(e, id) { $('.tab-content').hide(); $('.tab-btn').removeClass('active'); $('#'+id).show(); if(e) $(e.currentTarget).addClass('active'); }
+    function openM(id) { const m = machines.find(x => x.id === id); $('#modal-name').text(m.n); $('#modal-oee').text('%'+m.o); $('#m-power-val').text(m.p); $('.overlay, #m-modal').fadeIn(); }
+    function closeM() { $('.overlay, #m-modal').fadeOut(); }
+    function addLog(m, cls) { const t = new Date().toLocaleTimeString(); nNum++; $('#notif-count').text(nNum); $('#notif-center').prepend(`<div class="notif-item" style="border-left-color:${cls==='red'?'red':'green'}"><strong>[${t}]</strong> ${m}</div>`); $('#log-list').prepend(`<div style="color:${cls}; border-bottom:1px solid #ddd; padding:8px;">[${t}] ${m}</div>`); }
+
+    function init() {
+        setInterval(() => { $('#live-clock').text(new Date().toLocaleTimeString()); }, 1000);
+        const list = $('#machine-list'), tBody = $('#m-table-body');
+        machines.forEach(m => {
+            $('<div>').addClass('st-card').text(m.n).click(()=>openM(m.id)).appendTo(list);
+            tBody.append(`<tr><td>${m.n}</td><td>Aktif</td><td>%${m.o}</td><td>${m.p}</td></tr>`);
+        });
+        setInterval(() => { if(!running) return; pCount++; if(Math.random()>0.98) dCount++; $('#kpi-p').text(pCount); $('#kpi-d').text(dCount); $('#kpi-o').text('%'+(pCount>0?((pCount-dCount)/pCount*100).toFixed(1):88)); }, 5000);
+        eChart = new Chart(document.getElementById('chart-energy'), {type:'bar', data:{labels:['01.05','02.05','03.05'], datasets:[{label:'Enerji kW/h', data:[450,520,380], backgroundColor:'#b2b2b2'}]}});
+        oChart = new Chart(document.getElementById('chart-oee'), {type:'line', data:{labels:['1','2','3','4'], datasets:[{label:'OEE%', data:[82,85,84,89], borderColor:'blue'}]}});
+        connectWS();
+    }
+</script>
