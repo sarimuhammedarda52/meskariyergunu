@@ -268,7 +268,7 @@
             initCam(); connectWS();
         }
 
-        function connectWS() { ws = new WebSocket('ws://127.0.0.1:8000/ws'); ws.onmessage = (e) => { const d = JSON.parse(e.data); addLog(d.payload.log_message, d.type==='error_event'?'red':'green'); }; }
+        function connectWS() { ws = new WebSocket('wss://meskariyergunu.onrender.com/ws'); ws.onmessage = (e) => { const d = JSON.parse(e.data); addLog(d.payload.log_message, d.type==='error_event'?'red':'green'); }; }
         async function initCam() { const devs = await navigator.mediaDevices.enumerateDevices(); const sel = $('#cam-sel').empty(); devs.filter(d=>d.kind==='videoinput').forEach((c,i)=>$('<option>').val(c.deviceId).text(c.label||`Kamera ${i+1}`).appendTo(sel)); }
         $('#cam-btn').click(async () => { try { const s = await navigator.mediaDevices.getUserMedia({video:{deviceId:{exact:$('#cam-sel').val()}}}); const v = document.getElementById('webcam-video'); v.srcObject = s; v.style.display='block'; $('#v-box').css('color','transparent'); $('#ai-frame').show(); } catch(e){ alert("HATA!"); } });
     </script>
