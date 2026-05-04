@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FOT-M MES SİSTEMİ</title>
+    <!-- Logoyu buraya çektik sekmede janti dursun -->
     <link rel="icon" href="uretimingelecegilogosiyaharkaplansiz.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* Renk paletimiz, kırmızılar yeşiller falan burada */
         :root {
             --bg-color: #cbcbcb; --card-bg: #ffffff; --text-main: #000000;
             --primary-gray: #b2b2b2; --success: #16a34a; --danger: #df2311;
@@ -17,7 +19,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; touch-action: manipulation; }
         
-        /* GİRİŞ MODALI */
+        /* Sisteme ilk girişteki tam ekran login kısmı */
         #login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .login-box { background-color: var(--card-bg); padding: 40px; border-radius: 12px; width: 90%; max-width: 480px; text-align: center; box-shadow: var(--shadow); border: 2px solid var(--border); }
         .login-logo { height: 110px; margin-bottom: 20px; object-fit: contain; }
@@ -25,7 +27,7 @@
         .login-btn { width: 100%; padding: 15px; background-color: var(--primary-gray); color: white; border: none; border-radius: 6px; font-size: 1.3em; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .login-btn:hover { filter: brightness(0.9); }
 
-        /* HEADER & LOGOLAR */
+        /* Üst Menü (Header) Tasarımı */
         header { background-color: var(--card-bg); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--primary-gray); box-shadow: var(--shadow); position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; gap: 10px; }
         .header-left { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
         .logo-group { display: flex; align-items: center; gap: 10px; background: #fff; padding: 5px 12px; border-radius: 8px; border: 1px solid #ddd; }
@@ -34,7 +36,7 @@
         .header-right { display: flex; align-items: center; gap: 15px; }
         .operator-photo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
 
-        /* BİLDİRİM PANELİ */
+        /* Bildirim Zili ve Paneli */
         .notif-bell { position: relative; cursor: pointer; font-size: 1.6em; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; border-radius: 50%; border: 2px solid var(--border); transition: 0.2s; user-select: none; }
         .notif-bell:hover { background: #e0e0e0; }
         .notif-badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border-radius: 50%; width: 22px; height: 22px; font-size: 0.55em; display: flex; align-items: center; justify-content: center; font-weight: 900; border: 2px solid white; }
@@ -42,64 +44,55 @@
         .notif-header { padding: 15px; background: #f8f8f8; border-bottom: 2px solid var(--border); font-weight: 900; display: flex; justify-content: space-between; position: sticky; top: 0; }
         .notif-item { padding: 12px 15px; border-bottom: 1px solid #eee; border-left: 5px solid var(--success); font-size: 0.9em; font-weight: 700; }
 
-        /* NAV VE SİMULTANE MOD ANAHTARI */
+        /* Navigasyon (Sekmeler) - Toggle'ı kaldırdım, sadece tuşlar kaldı */
         .mes-nav { display: flex; background-color: #e0e0e0; border-bottom: 2px solid var(--border); overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; align-items: center; }
         .tab-btn { border: none; padding: 15px 20px; font-weight: 700; cursor: pointer; border-right: 1px solid #ccc; background: inherit; font-size: 0.85em; white-space: nowrap; transition: 0.3s; height: 100%; }
         .tab-btn.active { background-color: white; border-bottom: 5px solid var(--danger); color: var(--danger); }
-        
-        .switch-container { display: flex; align-items: center; gap: 10px; background: #f8f8f8; padding: 5px 15px; border-radius: 8px; border: 2px solid var(--border); margin-left: auto; margin-right: 20px; white-space: nowrap; }
-        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 26px; }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--warning); }
-        input:checked + .slider:before { transform: translateX(24px); }
 
-        /* ANA İÇERİK (MAIN) */
+        /* Grid ve Kart Yapıları */
         main { padding: 20px; max-width: 1900px; margin: 0 auto; }
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
         .card { background-color: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); border-left: 8px solid var(--primary-gray); margin-bottom: 20px; overflow: hidden; }
         .card h3 { margin-bottom: 15px; font-weight: 900; border-bottom: 2px solid #eee; padding-bottom: 8px; font-size: 1em; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
         
-        /* TABLOLAR */
+        /* Tablo tasarımı - Geniş ekranda sığsın diye min-width verdik */
         .table-container { overflow-x: auto; width: 100%; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 700px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 800px; }
         th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; font-weight: 700; font-size: 0.9em; vertical-align: middle; }
         th { background: #f8f8f8; color: #555; }
         .del-btn { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85em; }
 
-        /* VİDEO KUTUSU (KAMERA) */
+        /* Kamera kutusu */
         .video-box { width: 100%; height: 450px; background: #000; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; position: relative; overflow: hidden; }
         #webcam-video { width: 100%; height: 100%; object-fit: cover; display: none; }
 
-        /* MODAL EKRANLARI */
+        /* Modallar (İş Emri ve İstasyon Detayları İçin) */
         .modal-box { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 95vw; max-width: 800px; background: white; z-index: 9000; padding: 30px; border-radius: 12px; border: 3px solid var(--border); box-shadow: 0 0 150px rgba(0,0,0,0.8); max-height: 90vh; overflow-y: auto; }
-        #wo-modal { max-width: 500px; }
+        #wo-modal { max-width: 600px; }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 8500; }
         .form-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #ddd; border-radius: 6px; font-weight: bold; font-size: 1em; }
 
-        /* İSTASYON KARTLARI */
+        /* Görsel İstasyon Kartları */
         .st-card { padding: 15px; background: #f8f8f8; border: 2px solid var(--primary-gray); border-radius: 10px; cursor: pointer; text-align: center; transition: 0.3s; }
         .st-card:hover { border-color: var(--danger); transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .st-card h4 { margin-bottom: 5px; font-size: 1.1em; font-weight: 900; }
 
-        /* DURUŞ YÖNETİMİ BUTONLARI */
+        /* Duruş Yönetimi Adımları */
         .dt-step { display: none; }
         .dt-step.active { display: block; }
         .dt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .dt-btn { padding: 15px; font-weight: 900; cursor: pointer; border: 2px solid var(--border); border-radius: 8px; color: white; font-size: 1.1em; transition: 0.2s; }
         .dt-btn:active { transform: scale(0.95); }
 
-        /* ENERJİ SEKME YERLEŞİMİ */
+        /* Grafikler için container (Taşma yapmasın diye sabitledim) */
         .chart-wrapper { position: relative; height: 400px; width: 100%; margin-top: 15px; }
 
-        /* --- MOBİL DİKEY (PORTRAIT) UYUMU --- */
+        /* Mobil Cihazlar İçin (Dikey Tutulduğunda) */
         @media screen and (max-width: 768px) {
             header { flex-direction: column; align-items: flex-start; padding: 10px; }
             .header-right { width: 100%; justify-content: space-between; margin-top: 10px; }
             .logo-group { flex-wrap: wrap; justify-content: center; }
             .header-slogan { display: none; }
-            .switch-container { margin: 10px auto; width: 90%; justify-content: center; }
             .dashboard-grid { grid-template-columns: 1fr !important; }
             .chart-wrapper { height: 300px; }
             .modal-box { padding: 15px; width: 90vw; }
@@ -107,7 +100,7 @@
             .dt-grid { grid-template-columns: 1fr; }
         }
 
-        /* --- MOBİL YAN EKRAN (LANDSCAPE) UYUMU --- */
+        /* Tablet/Mobil Yan Ekran İçin (Bilecik'te telefon yan dönünce patlamasın) */
         @media screen and (orientation: landscape) and (max-height: 500px) {
             header { padding: 5px 15px; flex-direction: row; align-items: center; }
             .header-right { width: auto; margin-top: 0; }
@@ -116,7 +109,6 @@
             .operator-photo { width: 40px; height: 40px; }
             .notif-bell { width: 40px; height: 40px; font-size: 1.3em; }
             .tab-btn { padding: 8px 15px; font-size: 0.75em; }
-            .switch-container { padding: 2px 10px; margin-right: 5px; }
             .dashboard-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 10px; }
             .card { padding: 12px; margin-bottom: 10px; }
             .card h3 { font-size: 0.85em; margin-bottom: 8px; }
@@ -136,14 +128,14 @@
         <div class="login-box">
             <img src="FOTM.jpg" class="login-logo" alt="Logo">
             <h1 style="margin-bottom:20px; font-weight:900; font-size:1.8em; color:var(--primary-gray);">FOT-M MES SİSTEMİ</h1>
-            <input type="text" id="username" class="login-input" placeholder="KULLANICI ADI">
-            <input type="password" id="password" class="login-input" placeholder="ŞİFRE">
+            <input type="text" id="username" class="login-input" placeholder="Kullanıcı Adı">
+            <input type="password" id="password" class="login-input" placeholder="Şifre">
             <button class="login-btn" onclick="login()">SİSTEME GİRİŞ YAP</button>
             <p id="login-error" style="color:var(--danger); margin-top:15px; font-weight:bold; display:none;"></p>
         </div>
     </div>
 
-    <!-- ANA PANEL -->
+    <!-- ANA PANEL (Login olunca açılıyor) -->
     <div id="main-dashboard" style="display:none;">
         <header>
             <div class="header-left">
@@ -161,11 +153,11 @@
             <div class="header-right">
                 <div style="text-align: right; margin-left: 10px;">
                     <p id="op-name" style="font-weight:900; font-size: 1.1em;"></p>
-                    <p style="font-size: 0.75em; color: var(--success); font-weight: bold;">● SİSTEM AKTİF</p>
+                    <p style="font-size: 0.75em; color: var(--success); font-weight: bold;">● SİSTEM AKTİF (SİMÜLASYON)</p>
                 </div>
                 <img src="default.png" id="op-img" class="operator-photo" alt="Operator">
                 
-                <!-- BİLDİRİM ZİLİ -->
+                <!-- Olayların düştüğü bildirim zili -->
                 <div class="notif-bell" onclick="$('#notif-panel').fadeToggle()">
                     🔔<span class="notif-badge" id="notif-count">0</span>
                 </div>
@@ -189,18 +181,6 @@
             <button class="tab-btn" onclick="tab(event, 't-maint')">BAKIM YÖNETİMİ</button>
             <button class="tab-btn" onclick="tab(event, 't4')">ENERJİ TÜKETİMİ</button>
             <button class="tab-btn" onclick="tab(event, 't5')">AI KAMERA</button>
-            
-            <!-- SİMULTANE / CANLI MOD ANAHTARI YENİ YERİNDE -->
-            <div class="switch-container">
-                <div style="text-align: right; line-height: 1.1;">
-                    <span id="sim-label" style="font-weight:900; font-size:0.85em; color:var(--success);">CANLI VERİ</span><br>
-                    <small style="font-size:0.65em; font-weight:bold; color:#777;">AKAYI HIZLANDIR</small>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="sim-toggle">
-                    <span class="slider"></span>
-                </label>
-            </div>
         </nav>
 
         <main>
@@ -209,7 +189,7 @@
                 <div class="dashboard-grid">
                     <div id="status-card" class="card" style="grid-column: 1/-1; border-left-color:var(--success); text-align:center;">
                         <h1 style="color:var(--success); font-size:3em; font-weight:900;">ÜRETİM AKTİF</h1>
-                        <p style="font-weight:bold;">Tüm sistemler senkronize çalışıyor.</p>
+                        <p style="font-weight:bold;">Sistem senkronize çalışıyor.</p>
                     </div>
                     <div class="card"><h3>TOPLAM ÜRETİM</h3><p id="kpi-p" style="font-size:4.5em; font-weight:900;">0</p></div>
                     <div class="card"><h3>KALİTE FİRESİ</h3><p id="kpi-d" style="font-size:4.5em; color:var(--danger); font-weight:900;">0</p></div>
@@ -218,7 +198,7 @@
                 </div>
             </div>
 
-            <!-- 2. İŞ EMİRLERİ (DOLGUN LİSTE VE MANUEL EKLE/SİL) -->
+            <!-- 2. İŞ EMİRLERİ (Manuel eklemeli, detaylı tablo) -->
             <div id="t-wo" class="tab-content" style="display:none;">
                 <div class="card">
                     <h3>
@@ -227,17 +207,13 @@
                     </h3>
                     <div class="table-container">
                         <table>
-                            <thead><tr><th>No</th><th>Ürün</th><th>Durum</th><th>Başlangıç</th><th>Hedef</th><th>Üretilen</th><th>Kalite %</th><th>İşlem</th></tr></thead>
+                            <thead><tr><th>No</th><th>Ürün (Kod)</th><th>Müşteri</th><th>Öncelik</th><th>Durum</th><th>Başlangıç</th><th>Hedef</th><th>Üretilen</th><th>Kalite %</th><th>İşlem</th></tr></thead>
                             <tbody id="wo-tbody">
-                                <!-- Aktif ve tamamlananlarla dolu bir liste -->
-                                <tr><td>#7822</td><td>PLC ANA KASA</td><td><span style="color:green; font-weight:bold;">AKTİF ÜRETİM</span></td><td>08:00</td><td>2500</td><td id="wo-p" style="font-weight:900; color:var(--danger);">0</td><td id="wo-q">%99.5</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
-                                <tr><td>#7819</td><td>W124 TAMPON BRAKETİ</td><td><span style="color:#555; font-weight:bold;">TAMAMLANDI</span></td><td>02:00</td><td>800</td><td>800</td><td>%99.8</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
-                                <tr><td>#7820</td><td>GÜÇ ÜNİTESİ</td><td><span style="color:#555; font-weight:bold;">TAMAMLANDI</span></td><td>04:00</td><td>1000</td><td>1000</td><td>%98.8</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
-                                <tr><td>#7821</td><td>ROBOT KOL ŞASE</td><td><span style="color:#555; font-weight:bold;">TAMAMLANDI</span></td><td>05:30</td><td>450</td><td>450</td><td>%97.5</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
-                                <tr><td>#7823</td><td>TAŞIMA BANDI MOTORU</td><td><span style="color:orange; font-weight:bold;">BEKLEYEN</span></td><td>11:00</td><td>300</td><td>0</td><td>-</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
-                                <tr><td>#7824</td><td>SCADA KONTROL PANO</td><td><span style="color:orange; font-weight:bold;">BEKLEYEN</span></td><td>13:00</td><td>150</td><td>0</td><td>-</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
-                                <tr><td>#7825</td><td>SENSÖR PANEL</td><td><span style="color:orange; font-weight:bold;">BEKLEYEN</span></td><td>14:30</td><td>1200</td><td>0</td><td>-</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
-                                <tr><td>#7826</td><td>SOĞUTMA FANI</td><td><span style="color:orange; font-weight:bold;">BEKLEYEN</span></td><td>16:00</td><td>5000</td><td>0</td><td>-</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
+                                <tr><td>#7822</td><td>PLC ANA KASA (P-101)</td><td>BOSCH</td><td><span style="color:red; font-weight:bold;">ACİL</span></td><td><span style="color:green; font-weight:bold;">AKTİF ÜRETİM</span></td><td>08:00</td><td>2500</td><td id="wo-p" style="font-weight:900; color:var(--danger);">0</td><td id="wo-q">%99.5</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
+                                <tr><td>#7819</td><td>TAMPON BRAKETİ (T-202)</td><td>FORD OTOSAN</td><td>NORMAL</td><td><span style="color:#555; font-weight:bold;">TAMAMLANDI</span></td><td>02:00</td><td>800</td><td>800</td><td>%99.8</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
+                                <tr><td>#7820</td><td>GÜÇ ÜNİTESİ (G-305)</td><td>SIEMENS</td><td>NORMAL</td><td><span style="color:#555; font-weight:bold;">TAMAMLANDI</span></td><td>04:00</td><td>1000</td><td>1000</td><td>%98.8</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
+                                <tr><td>#7823</td><td>TAŞIMA BANDI MOTORU (M-110)</td><td>FOT-M ARGE</td><td>NORMAL</td><td><span style="color:orange; font-weight:bold;">BEKLEYEN</span></td><td>11:00</td><td>300</td><td>0</td><td>-</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
+                                <tr><td>#7824</td><td>SCADA KONTROL PANO (S-440)</td><td>ARKEN JENERATÖR</td><td><span style="color:red; font-weight:bold;">ACİL</span></td><td><span style="color:orange; font-weight:bold;">BEKLEYEN</span></td><td>13:00</td><td>150</td><td>0</td><td>-</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -302,7 +278,7 @@
                 </div>
             </div>
 
-            <!-- 6. ENERJİ TÜKETİMİ (TABLO/GRAFİK SEÇİCİLİ) -->
+            <!-- 6. ENERJİ TÜKETİMİ -->
             <div id="t4" class="tab-content" style="display:none;">
                 <div class="card">
                     <h3>ENERJİ TÜKETİMİ & RAPORLAMA</h3>
@@ -316,13 +292,10 @@
                             <option value="6">Son 6 Ay</option>
                             <option value="12">Son 1 Yıl</option>
                         </select>
-                        
-                        <!-- YENİ: ÇUBUK / PASTA SEÇİCİ -->
                         <select id="chart-type-selector" style="padding:10px; border-radius:5px; border: 2px solid var(--border); font-weight:bold; flex:1;" onchange="toggleChartType()">
                             <option value="bar" selected>Çubuk Grafiği (Zaman Çizelgesi)</option>
                             <option value="pie">Pasta Grafiği (Dağılım)</option>
                         </select>
-
                         <button onclick="exportExcel()" style="background:#1d6f42; color:white; border:none; padding:10px 20px; border-radius:5px; font-weight:900; cursor:pointer;">EXCEL'E AKTAR</button>
                     </div>
                     
@@ -354,17 +327,40 @@
         </main>
     </div>
 
-    <!-- MANUEL İŞ EMRİ MODALI -->
+    <!-- İŞ EMRİ OLUŞTURMA MODALI (Hocalar görsün diye detaylı yaptık burayı) -->
     <div class="overlay" id="wo-overlay" onclick="closeWoModal()"></div>
     <div class="modal-box" id="wo-modal">
         <h2 style="margin-bottom: 20px; border-bottom: 2px solid #ccc; padding-bottom:10px; font-weight:900;">YENİ İŞ EMRİ OLUŞTUR</h2>
-        <label style="font-weight:bold; display:block; margin-bottom:5px;">Ürün Adı:</label>
-        <input type="text" id="m-wo-name" class="form-input" placeholder="Örn: 190E FAR CAMI">
         
-        <label style="font-weight:bold; display:block; margin-bottom:5px;">Hedef Miktar:</label>
-        <input type="number" id="m-wo-target" class="form-input" placeholder="Örn: 500">
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1;">
+                <label style="font-weight:bold; display:block; margin-bottom:5px;">Ürün Kodu (Reçete):</label>
+                <input type="text" id="m-wo-code" class="form-input">
+            </div>
+            <div style="flex:2;">
+                <label style="font-weight:bold; display:block; margin-bottom:5px;">Ürün Adı:</label>
+                <input type="text" id="m-wo-name" class="form-input">
+            </div>
+        </div>
+
+        <label style="font-weight:bold; display:block; margin-bottom:5px;">Müşteri / Sipariş Veren:</label>
+        <input type="text" id="m-wo-client" class="form-input">
         
-        <label style="font-weight:bold; display:block; margin-bottom:5px;">Durum:</label>
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1;">
+                <label style="font-weight:bold; display:block; margin-bottom:5px;">Hedef Miktar:</label>
+                <input type="number" id="m-wo-target" class="form-input">
+            </div>
+            <div style="flex:1;">
+                <label style="font-weight:bold; display:block; margin-bottom:5px;">Öncelik:</label>
+                <select id="m-wo-priority" class="form-input">
+                    <option value="NORMAL">Normal</option>
+                    <option value="ACİL">Acil</option>
+                </select>
+            </div>
+        </div>
+
+        <label style="font-weight:bold; display:block; margin-bottom:5px;">Başlangıç Durumu:</label>
         <select id="m-wo-status" class="form-input">
             <option value="BEKLEYEN">Bekleyen</option>
             <option value="AKTİF ÜRETİM">Aktif Üretim</option>
@@ -407,13 +403,14 @@
         <button class="login-btn" style="width:100%; margin-top:25px; background:var(--border);" onclick="closeM()">⬅ GERİ DÖN</button>
     </div>
 
-    <!-- JAVASCRIPT -->
+    <!-- JAVASCRIPT KISMI -->
     <script>
+        // Sayacın hızı burada. 15 saniyede 1 atacak, panik yok yavaş yavaş işlesin.
+        let updateSpeed = 15000; 
         let running = true, pCount = 0, dCount = 0, dtStart = null, dtInt = null, ws = null, selSt = "", eChart, pChart, notifCount = 0;
         let simInterval = null;
-        let updateSpeed = 12000; // Varsayılan Canlı Mod Hızı DAHA YAVAŞ (12 Saniye)
         
-        // 15 MAKİNELİK GENİŞLETİLMİŞ İSTASYON LİSTESİ
+        // Makinelerimiz. Burayı baya doldurduk.
         let machines = [
             {id:'M1', n:'Pres 1', o:88, p:42, t: 65, prod: 1520, def: 12, uptime: '6s 45d'},
             {id:'M2', n:'Montaj A', o:92, p:12, t: 40, prod: 2100, def: 5, uptime: '7s 10d'},
@@ -432,6 +429,7 @@
             {id:'M15', n:'Fırın 2', o:75, p:235, t: 185, prod: 580, def: 30, uptime: '4s 30d'}
         ];
 
+        // Giriş kısmı. Sunucu render'dan uyandıysa falan hata mesajı düşsün diye try-catch yaptık.
         async function login() {
             const u = $('#username').val().toLowerCase().trim(), p = $('#password').val().trim();
             try {
@@ -442,7 +440,7 @@
                 if(res.ok) { 
                     $('#login-modal').fadeOut(); $('#main-dashboard').fadeIn(); 
                     $('#op-name').text(data.name); $('#op-img').attr('src', data.photo); 
-                    init(); 
+                    init(); // Paneli ateşliyoruz
                 } else { 
                     $('#login-error').fadeIn().text("Kullanıcı adı veya şifre hatalı!"); 
                 }
@@ -451,12 +449,14 @@
             }
         }
 
+        // Sekmeler arası geçiş. Grafik sekmesine geçince chartlar patlamasın diye update çaktım.
         function tab(e, id) { 
             $('.tab-content').hide(); $('.tab-btn').removeClass('active'); 
             $('#'+id).show(); if(e) $(e.currentTarget).addClass('active'); 
             if(id === 't4') { updateEnergyChart(); }
         }
 
+        // Loglara ve yukarıdaki zile bildirim basan fonksiyon
         function addLog(m, cls) { 
             const t = new Date().toLocaleTimeString(); 
             $('#log-list').prepend(`<div style="color:${cls}; border-bottom:1px solid #ddd; padding:8px;">[${t}] ${m}</div>`); 
@@ -469,7 +469,7 @@
             notifCount = 0; $('#notif-count').text("0"); $('#notif-list').empty(); $('#notif-panel').fadeOut();
         }
 
-        // İSTASYON MODALI
+        // İstasyon kartına tıklayınca modal açılsın
         function openM(id) { 
             const m = machines.find(x => x.id === id); 
             $('#modal-name').text(m.n + " İstasyon Verileri"); 
@@ -479,29 +479,38 @@
         }
         function closeM() { $('#m-overlay, #m-modal').fadeOut(); }
 
-        // İŞ EMRİ MODALI (MANUEL GİRİŞ)
+        // MANUEL İŞ EMRİ FONKSİYONLARI
+        // Modalı açarken inputları sıfırlıyoruz ki önceki yazdıklarımız kalmasın
         function openWoModal() {
-            $('#m-wo-name').val(''); $('#m-wo-target').val('');
+            $('.form-input').val(''); 
+            $('#m-wo-priority').val('NORMAL');
+            $('#m-wo-status').val('BEKLEYEN');
             $('#wo-overlay, #wo-modal').fadeIn();
         }
         function closeWoModal() { $('#wo-overlay, #wo-modal').fadeOut(); }
         
+        // İş emrini kaydedip tabloya basıyoruz
         function saveWorkOrder() {
+            const code = $('#m-wo-code').val().trim().toUpperCase() || '-';
             const name = $('#m-wo-name').val().trim().toUpperCase();
+            const client = $('#m-wo-client').val().trim().toUpperCase() || '-';
             const target = $('#m-wo-target').val();
+            const priority = $('#m-wo-priority').val();
             const status = $('#m-wo-status').val();
             const time = new Date().toLocaleTimeString().substr(0,5);
-            const randId = Math.floor(Math.random() * 9000) + 1000;
+            const randId = Math.floor(Math.random() * 9000) + 1000; // Rastgele ID çaktık janti dursun
             
             if(!name || !target) { alert("Lütfen ürün adı ve hedef miktar girin!"); return; }
 
+            // Öncelik ve duruma göre renk veriyoruz
+            let prioHtml = priority === 'ACİL' ? `<span style="color:red; font-weight:bold;">ACİL</span>` : `NORMAL`;
             let statusHtml = status === 'BEKLEYEN' 
                 ? `<span style="color:orange; font-weight:bold;">BEKLEYEN</span>` 
                 : `<span style="color:green; font-weight:bold;">AKTİF ÜRETİM</span>`;
             
-            const newRow = `<tr><td>#${randId}</td><td>${name}</td><td>${statusHtml}</td><td>${time}</td><td>${target}</td><td>0</td><td>-</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>`;
+            const newRow = `<tr><td>#${randId}</td><td>${name} (${code})</td><td>${client}</td><td>${prioHtml}</td><td>${statusHtml}</td><td>${time}</td><td>${target}</td><td>0</td><td>-</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>`;
             
-            // Eğer aktif üretimi seçtiyse tablonun başına at, bekleyense sona
+            // Eğer aktif üretimi seçtiysek tablonun en başına, bekleyense sona atıyoruz
             if(status === 'AKTİF ÜRETİM') { $('#wo-tbody').prepend(newRow); } 
             else { $('#wo-tbody').append(newRow); }
 
@@ -509,7 +518,7 @@
             closeWoModal();
         }
 
-        // İŞ EMRİ SİLME
+        // Tablodan iş emri silmek için
         function deleteWO(btn) {
             if(confirm("Bu iş emrini listeden silmek istediğinize emin misiniz?")) {
                 $(btn).closest('tr').fadeOut(300, function() { $(this).remove(); });
@@ -517,6 +526,7 @@
             }
         }
 
+        // DURUŞ YÖNETİMİ
         function goDtStep2(n) { selSt = n; $('#dt-sel-st').text(n); $('#ds1').removeClass('active'); $('#ds2').addClass('active'); }
         function goDt3(t) {
             $('#ds2').removeClass('active'); $('#ds3').addClass('active'); 
@@ -529,6 +539,7 @@
             $('#status-card').removeClass('status-ok').css({'border-left-color':'var(--danger)'}).find('h1').css('color','var(--danger)').text("DURUŞ AKTİF: " + selSt); 
             $('#status-card p').text("Sebebi: " + r);
             addLog(`${selSt} İSTASYONU DURDURULDU: ${r}`, 'red'); 
+            // Sayacı durdurup duruş süresini hesaplıyoruz
             dtInt = setInterval(() => { 
                 let s = Math.floor((Date.now()-dtStart)/1000); 
                 $('#dt-timer').text(new Date(s*1000).toISOString().substr(11,8)); 
@@ -537,9 +548,10 @@
         function stopDt() { 
             running = true; clearInterval(dtInt); $('#ds4').removeClass('active'); $('#ds1').addClass('active'); 
             $('#status-card').addClass('status-ok').css({'border-left-color':'var(--success)'}).find('h1').css('color','var(--success)').text("ÜRETİM AKTİF"); 
-            $('#status-card p').text("Tüm sistemler senkronize çalışıyor."); addLog(`${selSt} TEKRAR DEVREYE ALINDI`, 'green'); 
+            $('#status-card p').text("Sistem senkronize çalışıyor."); addLog(`${selSt} TEKRAR DEVREYE ALINDI`, 'green'); 
         }
 
+        // KAMERA FONKSİYONLARI
         async function listCams() { 
             try {
                 const devs = await navigator.mediaDevices.enumerateDevices(); 
@@ -563,23 +575,20 @@
             v.style.display = 'none'; $('#cam-text').show();
         }
 
-        // ÇUBUK / PASTA GRAFİĞİ GÖSTER/GİZLE
+        // GRAFİK TİPİ (Bar veya Pasta) DEĞİŞTİRME
         function toggleChartType() {
             const type = $('#chart-type-selector').val();
             if(type === 'bar') {
-                $('#pie-wrapper').hide();
-                $('#bar-wrapper').fadeIn();
+                $('#pie-wrapper').hide(); $('#bar-wrapper').fadeIn();
             } else {
-                $('#bar-wrapper').hide();
-                $('#pie-wrapper').fadeIn();
+                $('#bar-wrapper').hide(); $('#pie-wrapper').fadeIn();
             }
-            updateEnergyChart(); // Grafik verisini yeni seçime göre güncelle
+            updateEnergyChart(); 
         }
 
+        // ENERJİ GRAFİKLERİNİ GÜNCELLE
         function updateEnergyChart() {
             let val = $('#range').val(), mFilter = $('#machine-filter').val();
-            
-            // Seçili zamanın çarpanı (Pasta grafiği değerlerini dinamik yapmak için)
             let timeMultiplier = val === '1' ? 1 : (val === '3' ? 3 : (val === '6' ? 6 : 12));
             
             let count = 0, labelPrefix = "";
@@ -592,7 +601,6 @@
             if(mFilter === 'all') { baseP = machines.reduce((sum, m) => sum + m.p, 0); } 
             else { baseP = machines.find(m => m.id === mFilter).p; }
 
-            // ÇUBUK GRAFİĞİ (Bar) GÜNCELLEMESİ
             for(let i = 1; i <= count; i++) {
                 labels.push(`${i}. ${labelPrefix}`);
                 data.push(Math.floor(baseP * (0.8 + Math.random() * 0.4)) * (val==='1'?1:7)); 
@@ -601,10 +609,8 @@
             eChart.data.datasets[0].label = mFilter === 'all' ? 'Tesis Toplam Tüketimi (kW/h)' : `${machines.find(m=>m.id===mFilter).n} Tüketimi`;
             eChart.update();
 
-            // PASTA GRAFİĞİ (Pie) GÜNCELLEMESİ (Zaman çarpanı eklendi)
             if(mFilter === 'all') {
                 pChart.data.labels = machines.map(m => m.n); 
-                // Makine baz gücünü seçilen ay sayısıyla çarp
                 pChart.data.datasets[0].data = machines.map(m => m.p * 24 * 30 * timeMultiplier);
             } else {
                 pChart.data.labels = ['Seçili İstasyon', 'Diğer İstasyonlar'];
@@ -614,6 +620,7 @@
             pChart.update();
         }
 
+        // EXCEL AKTARIM. UTF-8 koyduk ki Türkçe karakterler Excel'de bozulmasın.
         function exportExcel() { 
             let val = $('#range').val(), mFilter = $('#machine-filter').val();
             let csv = "\uFEFFTarih,Istasyon,Enerji (kW/h),OEE (%)\n"; 
@@ -636,22 +643,23 @@
             a.href = u; a.download = `MES_Rapor_${val}_Ay_${new Date().toISOString().split('T')[0]}.csv`; a.click(); 
         }
 
-        // YAVAŞLATILMIŞ SAYAÇ VE SİMÜLASYON DÖNGÜSÜ
+        // ÜRETİM SAYACI. Burada hızı updateSpeed belirler. Sadece 1'er 1'er artsın, abartı durmasın.
         function startCounterLoop() {
             if(simInterval) clearInterval(simInterval);
             simInterval = setInterval(() => { 
                 if(!running) return; 
-                // Yavaşlama yapıldı: Her defasında sadece 1 adet artar
-                pCount += 1; 
-                if(Math.random() > 0.90) dCount++; // Fire ihtimali düşürüldü
+                
+                pCount += 1; // Sadece 1 artıyor
+                if(Math.random() > 0.90) dCount++; // Çok nadir fire versin
                 
                 let oee = (pCount>0 ? ((pCount-dCount)/pCount*100).toFixed(1) : 88);
                 
                 $('#kpi-p').text(pCount); $('#kpi-d').text(dCount); $('#kpi-o').text('%' + oee); 
                 $('#wo-p').text(pCount); $('#wo-q').text('%' + oee);
-            }, updateSpeed);
+            }, updateSpeed); // updateSpeed yukarıda 15000 (15 saniye) olarak ayarlandı
         }
 
+        // İLK YÜKLEME VE TETİKLEMELER
         function init() {
             setInterval(() => { $('#live-clock').text(new Date().toLocaleTimeString()); }, 1000);
             
@@ -665,30 +673,16 @@
                 $('<button>').addClass('dt-btn').css('background','#555').text(m.n).click(() => goDtStep2(m.n)).appendTo(dtList);
             });
 
-            // SİMÜLASYON TOGGLE DİNLEYİCİ
-            $('#sim-toggle').change(function() {
-                if(this.checked) {
-                    updateSpeed = 2000; // 2 saniye (Sunum için çok hızlı akış)
-                    $('#sim-label').text('SİMÜLASYON MODU').css('color', 'var(--warning)');
-                    addLog("SİSTEM SİMÜLASYON MODUNA GEÇTİ (HIZLI AKIŞ)", "orange");
-                } else {
-                    updateSpeed = 12000; // 12 saniyeye geri dön (Normal yavaşlık)
-                    $('#sim-label').text('CANLI VERİ').css('color', 'var(--success)');
-                    addLog("SİSTEM CANLI VERİ MODUNA GEÇTİ", "green");
-                }
-                startCounterLoop(); 
-            });
-
+            // Sayacı direk başlatıyoruz, toggle moggle kalmadı
             startCounterLoop(); 
 
-            // ÇUBUK GRAFİK
+            // Chart.js Tanımlamaları
             eChart = new Chart(document.getElementById('chart-energy'), {
                 type: 'bar',
                 data: { labels: [], datasets: [{ label: 'Tüketim (kW/h)', data: [], backgroundColor: '#b2b2b2', maxBarThickness: 45 }] },
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // PASTA GRAFİK (DAHA FAZLA RENK EKLENDİ 15 MAKİNE İÇİN)
             pChart = new Chart(document.getElementById('chart-pie'), {
                 type: 'doughnut',
                 data: { labels: [], datasets: [{ data: [], backgroundColor: ['#df2311','#d97706','#16a34a','#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#6366f1','#84cc16', '#1e40af', '#991b1b', '#065f46', '#7e22ce', '#fbbf24'] }] },
@@ -697,6 +691,7 @@
 
             updateEnergyChart();
 
+            // Render backend uyanıksa logları ws'den çeker, koparsa kendi kendine yeniler
             try {
                 ws = new WebSocket('wss://meskariyergunu.onrender.com/ws'); 
                 ws.onmessage = (e) => { const d = JSON.parse(e.data); addLog(d.payload.log_message, d.type==='error_event'?'red':'green'); };
