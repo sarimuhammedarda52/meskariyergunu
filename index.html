@@ -210,7 +210,7 @@
         async function login() {
             const u = $('#username').val().toLowerCase().trim(), p = $('#password').val().trim();
             try {
-                const res = await fetch('http://127.0.0.1:8000/api/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p})});
+                const res = await fetch('https://meskariyergunu.onrender.com/api/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p})});
                 const data = await res.json();
                 if(res.ok) { $('#login-modal').hide(); $('#main-dashboard').show(); $('#op-name').text(data.name); $('#op-img').attr('src', data.photo); init(); }
                 else { $('#login-error').show(); }
