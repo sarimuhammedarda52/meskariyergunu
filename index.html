@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FOT-M MES SİSTEMİ</title>
+    <link rel="icon" href="uretimingelecegilogosiyaharkaplansiz.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #cbcbcb;
+            --card-bg: #ffffff;
+            --text-main: #000000;
+            --primary-gray: #b2b2b2;
+            --success: #16a34a;
+            --danger: #df2311;
+            --warning: #d97706;
+            --border: #000000;
+            --shadow: 0 6px 15px rgba(0, 0, 0, 0.35);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; touch-action: manipulation; }
+        #login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .login-box { background-color: var(--card-bg); padding: 50px; border-radius: 12px; width: 480px; text-align: center; box-shadow: var(--shadow); border: 2px solid var(--border); }
+        .login-logo { height: 130px; margin-bottom: 25px; object-fit: contain; }
+        .login-header-text { font-size: 2.2em; font-weight: 700; color: var(--primary-gray); margin-bottom: 40px; letter-spacing: 2px; text-transform: uppercase; }
+        .login-input { width: 100%; padding: 18px; margin-bottom: 20px; border: 2px solid var(--border); border-radius: 6px; font-size: 1.1em; text-transform: uppercase; outline: none; }
+        .login-btn { width: 100%; padding: 18px; background-color: var(--primary-gray); color: white; border: none; border-radius: 6px; font-size: 1.4em; font-weight: 700; cursor: pointer; }
+        header { background-color: var(--card-bg); padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--primary-gray); box-shadow: var(--shadow); }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .logo { height: 80px; object-fit: contain; }
+        .clock-box { font-size: 1.8em; font-weight: 700; background: #f0f0f0; padding: 5px 20px; border-radius: 6px; border: 2px solid var(--border); font-family: monospace; }
+        .slogan-group { display: flex; align-items: center; gap: 3px; }
+        .header-slogan { font-size: 1.1em; font-weight: 900; }
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .notif-bell { position: relative; cursor: pointer; font-size: 1.6em; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; border-radius: 50%; border: 2px solid var(--border); }
+        .notif-badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border-radius: 50%; width: 22px; height: 22px; font-size: 0.7em; display: flex; align-items: center; justify-content: center; font-weight: 900; border: 2px solid white; }
+        .operator-photo { width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
+        .mes-nav { display: flex; background-color: #e0e0e0; border-bottom: 2px solid var(--border); overflow-x: auto; scrollbar-width: none; }
+        .tab-btn { border: none; padding: 18px 25px; font-weight: 700; cursor: pointer; border-right: 1px solid #ccc; background: inherit; transition: 0.3s; font-size: 0.85em; white-space: nowrap; }
+        .tab-btn.active { background-color: white; border-bottom: 5px solid var(--danger); color: var(--danger); }
+        main { padding: 25px; max-width: 1900px; margin: 0 auto; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
+        .card { background-color: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: var(--shadow); border-left: 8px solid var(--primary-gray); }
+        .card h3 { margin-bottom: 20px; font-weight: 900; border-bottom: 2px solid #eee; padding-bottom: 10px; font-size: 1.1em; text-transform: uppercase; }
+        .status-ok { border-left-color: var(--success) !important; text-align: center; }
+        .status-ok h1 { color: var(--success) !important; font-size: 3.5em; font-weight: 900; }
+        .status-err { border-left-color: var(--danger) !important; background-color: #fff5f5; text-align: center; }
+        .station-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        .st-card { padding: 20px; border: 2px solid #ccc; border-radius: 10px; text-align: center; cursor: pointer; background: #fcfcfc; font-weight: 900; transition: 0.2s; }
+        .st-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+        #m-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 850px; background: white; z-index: 9000; padding: 40px; border-radius: 12px; border: 3px solid var(--border); box-shadow: 0 0 150px rgba(0,0,0,0.8); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 8500; }
+        .dt-step { display: none; }
+        .dt-step.active { display: block; }
+        .dt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .dt-btn { padding: 20px; font-weight: 900; cursor: pointer; border: 2px solid var(--border); border-radius: 8px; color: white; font-size: 1.1em; }
+        .video-box { width: 100%; height: 500px; background: #000; position: relative; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; color: white; }
+        #webcam-video { width: 100%; height: 100%; object-fit: cover; display: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 15px; border-bottom: 1px solid #eee; text-align: left; font-weight: 700; font-size: 0.95em; }
+        th { background: #f8f8f8; text-transform: uppercase; color: #555; }
+        .export-btn { background: #1d6f42; color: white; padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: 900; }
+        .notif-item { padding: 18px; border-bottom: 1px solid #eee; border-left: 6px solid var(--primary-gray); background: #f9f9f9; margin-bottom: 10px; border-radius: 6px; }
+    </style>
+</head>
+<body>
+
+    <div id="login-modal">
+        <div class="login-box">
+            <img src="FOTM.jpg" class="login-logo">
+            <h1 class="login-header-text">FOT-M MES SİSTEMİ</h1>
+            <form onsubmit="return false;">
+                <input type="text" id="username" class="login-input" placeholder="KULLANICI ADI">
+                <input type="password" id="password" class="login-input" placeholder="ŞİFRE">
+                <button type="button" class="login-btn" onclick="login()">GİRİŞ YAP</button>
+                <p id="login-error" style="color:var(--danger); margin-top:15px; font-weight:bold; display:none;">Giriş Reddedildi!</p>
+            </form>
+        </div>
+    </div>
+
+    <div class="overlay" onclick="closeM()"></div>
+    <div id="m-modal">
+        <h2 id="modal-name" style="margin-bottom: 25px; border-bottom: 3px solid var(--border); font-weight: 900;">İstasyon Analizi</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="card" style="padding:15px; border-left: 8px solid var(--success);"><h3>ANLIK OEE</h3><h2 id="modal-oee" style="color:var(--success); font-size: 3em;">%0</h2></div>
+            <div class="card" style="padding:15px; border-left: 8px solid var(--warning);"><h3>ENERJİ</h3><h2 id="m-power-val" style="font-size: 3em; color:var(--warning);">0</h2><p>kW/h (Anlık)</p></div>
+            <div class="card" style="grid-column: span 2; padding:15px;">
+                <h3>KESTİRİMCİ BAKIM VERİLERİ</h3>
+                <table><thead><tr><th>Sensör</th><th>Hedef</th><th>Mevcut</th><th>Durum</th></tr></thead><tbody><tr><td>Titreşim</td><td>2.0 mm/s</td><td>1.3 mm/s</td><td><span style="color:green">STABİL</span></td></tr><tr><td>Sıcaklık</td><td>85°C</td><td>81.4°C</td><td><span style="color:green">UYGUN</span></td></tr></tbody></table>
+            </div>
+        </div>
+        <button class="login-btn" style="margin-top:30px; width:100%; background:var(--border);" onclick="closeM()">ANALİZDEN ÇIK</button>
+    </div>
+
+    <div id="main-dashboard" style="display:none;">
+        <header>
+            <div class="header-left">
+                <img src="FOTM.jpg" class="logo">
+                <img src="images.png" class="logo">
+                <img src="download.png" class="logo">
+                <div class="clock-box" id="live-clock">00:00:00</div>
+                <div class="slogan-group">
+                    <img src="uretimingelecegilogobeyaz.png" class="logo" style="height: 70px;">
+                    <span class="header-slogan">Üretimin Geleceği Bizim Elimizde</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="operator-panel" style="display:flex; align-items:center; gap:10px;">
+                    <div style="text-align: right;"><p id="op-name" style="font-weight:900; font-size: 1.2em;"></p><p style="font-size: 0.8em; color: var(--success); font-weight: bold;">● BAĞLI</p></div>
+                    <img src="default.png" id="op-img" class="operator-photo">
+                </div>
+                <div class="notif-bell" onclick="tab(null, 't-notif')">🔔<span class="notif-badge" id="notif-count">0</span></div>
+            </div>
+        </header>
+
+        <nav class="mes-nav">
+            <button class="tab-btn active" onclick="tab(event, 't1')">ANDON DASHBOARD</button>
+            <button class="tab-btn" onclick="tab(event, 't-wo')">İŞ EMİRLERİ</button>
+            <button class="tab-btn" onclick="tab(event, 't2')">İSTASYON İZLEME</button>
+            <button class="tab-btn" onclick="tab(event, 't3')">DURUŞ YÖNETİMİ</button>
+            <button class="tab-btn" onclick="tab(event, 't-maint')">BAKIM YÖNETİMİ</button>
+            <button class="tab-btn" onclick="tab(event, 't4')">ENERJİ & ANALİZ</button>
+            <button class="tab-btn" onclick="tab(event, 't5')">AI KAMERA MODÜLÜ</button>
+            <button class="tab-btn" style="margin-left: auto;" onclick="tab(event, 't-notif')">BİLDİRİMLER</button>
+        </nav>
+
+        <main>
+            <div id="t1" class="tab-content active">
+                <div class="dashboard-grid">
+                    <div id="status-card" class="card status-ok" style="grid-column: 1/-1;"><h1>ÜRETİM AKTİF</h1><p style="font-weight:900;">TÜM SİSTEMLER SENKRONİZE ÇALIŞIYOR</p></div>
+                    <div class="card"><h3>TOPLAM ÜRETİM</h3><p id="kpi-p" style="font-size:4.5em; font-weight: 900;">0</p></div>
+                    <div class="card"><h3>KALİTE FİRESİ</h3><p id="kpi-d" style="font-size:4.5em; color:var(--danger); font-weight: 900;">0</p></div>
+                    <div class="card"><h3>HAT OEE %</h3><p id="kpi-o" style="font-size:4.5em; color:var(--success); font-weight: 900;">%0</p></div>
+                    <div class="card" style="grid-column: span 2;"><h3>SİSTEM OLAY GÜNLÜĞÜ</h3><div id="log-list" style="max-height:250px; overflow-y:auto; font-family:monospace; font-size:1.1em;"></div></div>
+                </div>
+            </div>
+
+            <div id="t-wo" class="tab-content" style="display:none;">
+                <div class="card">
+                    <h3>AKTİF VE TAMAMLANAN İŞ EMİRLERİ</h3>
+                    <table><thead><tr><th>No</th><th>Ürün</th><th>Durum</th><th>Başlangıç</th><th>Bitiş (Plan)</th><th>Hedef</th><th>Üretilen</th><th>Kalite %</th></tr></thead>
+                    <tbody id="wo-table">
+                        <tr><td>#7822</td><td>PLC ANA KASA</td><td><span style="color:green">AKTİF</span></td><td>08:00</td><td>18:00</td><td>2500</td><td id="wo-p">0</td><td>%99.5</td></tr>
+                        <tr><td>#7820</td><td>SENSÖR PANEL</td><td>BİTTİ</td><td>04:00</td><td>07:30</td><td>1000</td><td>1000</td><td>%98.8</td></tr>
+                    </tbody></table>
+                </div>
+            </div>
+
+            <div id="t2" class="tab-content" style="display:none;">
+                <div class="card">
+                    <h3>GÖRSEL İSTASYON HARİTASI</h3>
+                    <div class="station-grid" id="machine-list"></div>
+                    <h3 style="margin-top:30px;">İSTASYON VERİ TABLOSU</h3>
+                    <table id="m-table"><thead><tr><th>İstasyon</th><th>Durum</th><th>OEE</th><th>Enerji (kW/h)</th></tr></thead><tbody id="m-table-body"></tbody></table>
+                </div>
+            </div>
+
+            <div id="t3" class="tab-content" style="display:none;">
+                <div class="card" style="max-width: 900px; margin: 0 auto;">
+                    <div id="ds1" class="dt-step active"><h3>1. ADIM: İSTASYON SEÇİN</h3><div class="dt-grid" id="dt-st-list"></div></div>
+                    <div id="ds2" class="dt-step"><h3>2. ADIM: DURUŞ TİPİ SEÇİN (<span id="dt-sel-st"></span>)</h3><div class="dt-grid"><button class="dt-btn" style="background:var(--warning);" onclick="goDt3('Planlı')">PLANLI DURUŞ</button><button class="dt-btn" style="background:var(--danger);" onclick="goDt3('Plansız')">PLANSIZ DURUŞ</button></div></div>
+                    <div id="ds3" class="dt-step"><h3>3. ADIM: DURUŞ SEBEBİ SEÇİN</h3><div id="dt-reasons" class="dt-grid"></div><button onclick="tab(null, 't3')" style="margin-top:20px; width:100%; padding:10px;">İPTAL</button></div>
+                    <div id="ds4" class="dt-step"><h2 style="color:var(--danger);">DURUŞ AKTİF: MAKİNE PASİF</h2><h1 id="dt-timer" style="font-size:6em; font-family:monospace;">00:00:00</h1><button class="dt-btn" style="background:var(--success); width:100%; height:100px; font-size:2em;" onclick="stopDt()">▶ ÜRETİME GERİ DÖN</button></div>
+                </div>
+            </div>
+
+            <div id="t-maint" class="tab-content" style="display:none;">
+                <div class="card">
+                    <h3>KESTİRİMCİ BAKIM YÖNETİMİ</h3>
+                    <table><thead><tr><th>Makine</th><th>Tip</th><th>Sensör Analizi</th><th>Durum</th><th>Kalan Ömür</th></tr></thead><tbody><tr><td>PRES-01</td><td>Kestirimci</td><td>Titreşim Bazlı</td><td>UYGUN</td><td>450 Saat</td></tr><tr><td>CNC-02</td><td>Periyodik</td><td>Takvim Bazlı</td><td><span style="color:red">KRİTİK</span></td><td>-2 Gün</td></tr></tbody></table>
+                </div>
+            </div>
+
+            <div id="t4" class="tab-content" style="display:none;">
+                <div class="dashboard-grid">
+                    <div class="card" style="grid-column: span 2;">
+                        <h3>ENERJİ TÜKETİMİ & RAPORLAMA</h3>
+                        <div style="margin-bottom:15px; display:flex; gap:10px;"><select id="range" style="padding:10px;" onchange="updateEnergyChart()"><option value="3">Son 3 Ay</option><option value="6">Son 6 Ay</option><option value="12">1 Yıl</option></select><button class="export-btn" onclick="exportExcel()">EXCEL'E AKTAR</button></div>
+                        <div style="height:400px;"><canvas id="chart-energy"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <h3>OEE TRENDİ</h3>
+                        <select id="oee-per" style="width:100%; margin-bottom:10px;" onchange="updateOeeChart()"><option value="gun">Günlük</option><option value="hafta">Haftalık</option><option value="ay">Aylık</option></select>
+                        <canvas id="chart-oee"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="t5" class="tab-content" style="display:none;">
+                <div class="card">
+                    <h3><span class="live-dot"></span> AI KALİTE DENETİMİ</h3>
+                    <div style="display:flex; gap:10px; margin-bottom:20px;"><select id="cam-sel" style="flex:1; padding:15px; border:2px solid var(--border); font-weight:900;"></select><button id="cam-btn" style="background:var(--danger); color:white; padding:0 30px; border:none; border-radius:8px; font-weight:900; cursor:pointer;">KAMERAYI AÇ</button></div>
+                    <div class="video-box" id="v-box">GÖRÜNTÜ BEKLENİYOR...<video id="webcam-video" autoplay playsinline muted></video><div id="ai-frame" style="position:absolute; border:4px solid #00ff00; width:224px; height:224px; display:none; pointer-events:none;"></div></div>
+                </div>
+            </div>
+
+            <div id="t-notif" class="tab-content" style="display:none;">
+                <div class="card"><h3>BİLDİRİM MERKEZİ</h3><div id="notif-center" style="max-height:600px; overflow-y:auto;"></div></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let running = true, pCount = 0, dCount = 0, dtStart = null, dtInt = null, ws = null, nNum = 0, selSt = "", eChart, oChart;
+        let machines = [{id:'M1', n:'Pres 1', o:88, p:42},{id:'M2', n:'Montaj A', o:92, p:12},{id:'M3', n:'CNC 1', o:85, p:8},{id:'M4', n:'Robot 1', o:78, p:15},{id:'M5', n:'Lazer', o:95, p:110},{id:'M6', n:'Abkant', o:89, p:25},{id:'M7', n:'Boya', o:78, p:160},{id:'M8', n:'Test', o:98, p:5},{id:'M9', n:'CNC 2', o:85, p:8},{id:'M10', n:'Sevkiyat', o:90, p:12},{id:'M11', n:'Hidrolik', o:84, p:55},{id:'M12', n:'Kalite', o:99, p:1}];
+
+        async function login() {
+            const u = $('#username').val().toLowerCase().trim(), p = $('#password').val().trim();
+            try {
+                const res = await fetch('http://127.0.0.1:8000/api/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p})});
+                const data = await res.json();
+                if(res.ok) { $('#login-modal').hide(); $('#main-dashboard').show(); $('#op-name').text(data.name); $('#op-img').attr('src', data.photo); init(); }
+                else { $('#login-error').show(); }
+            } catch(e) { $('#login-error').text("Sunucu Hatası!").show(); }
+        }
+
+        function tab(e, id) { $('.tab-content').hide(); $('.tab-btn').removeClass('active'); $('#'+id).show(); if(e) $(e.currentTarget).addClass('active'); }
+        function openM(id) { const m = machines.find(x => x.id === id); $('#modal-name').text(m.n); $('#modal-oee').text('%'+m.o); $('#m-power-val').text(m.p); $('.overlay, #m-modal').fadeIn(); }
+        function closeM() { $('.overlay, #m-modal').fadeOut(); }
+
+        function addLog(m, cls) { 
+            const t = new Date().toLocaleTimeString(); nNum++; $('#notif-count').text(nNum);
+            $('#notif-center').prepend(`<div class="notif-item" style="border-left-color:${cls==='red'?'red':'green'}"><strong>[${t}]</strong> ${m}</div>`);
+            $('#log-list').prepend(`<div style="color:${cls}; border-bottom:1px solid #ddd; padding:8px;">[${t}] ${m}</div>`); 
+        }
+
+        function goDtStep2(n) { selSt = n; $('#dt-sel-st').text(n); $('#ds1').removeClass('active'); $('#ds2').addClass('active'); }
+        function goDt3(t) {
+            $('#ds2').removeClass('active'); $('#ds3').addClass('active'); const div = $('#dt-reasons').empty();
+            const r = t==='Planlı'?['Mola','Vardiya Değişimi','Bakım','Diğer']:['Arıza','Kalite','Hammadde','Diğer'];
+            r.forEach(x => { $('<button>').addClass('dt-btn').css('background', t==='Planlı'?'#d97706':'#df2311').text(x).click(()=>{ if(x==='Diğer'){ let c=prompt("Sebep:"); if(c) startDt(c); } else startDt(x); }).appendTo(div); });
+        }
+
+        function startDt(r) {
+            running = false; dtStart = Date.now(); $('#ds3').removeClass('active'); $('#ds4').addClass('active'); $('#status-card').removeClass('status-ok').addClass('status-err').find('h1').text("DURUŞ: " + selSt);
+            addLog(`${selSt} DURDURULDU: ${r}`, 'red');
+            dtInt = setInterval(() => { let s = Math.floor((Date.now()-dtStart)/1000); $('#dt-timer').text(new Date(s*1000).toISOString().substr(11,8)); }, 1000);
+        }
+        function stopDt() { running = true; clearInterval(dtInt); $('#ds4').removeClass('active'); $('#ds1').addClass('active'); $('#status-card').removeClass('status-err').addClass('status-ok').find('h1').text("ÜRETİM AKTİF"); addLog(`${selSt} Devrede`, 'green'); }
+
+        function updateEnergyChart() {
+            const r = parseInt($('#range').val()); let lbls = [], d = [];
+            for(let i=0; i<r*5; i++) { lbls.push(`2026-0${(i%5)+1}`); d.push(Math.floor(Math.random()*200)+300); }
+            eChart.data.labels = lbls; eChart.data.datasets[0].data = d; eChart.update();
+        }
+        function updateOeeChart() { const p = $('#oee-per').val(); oChart.data.datasets[0].data = p==='gun'?[85,88,84,90]:[80,82,85,82]; oChart.update(); }
+
+        function exportExcel() {
+            let csv = "Tarih,Istasyon,Enerji,OEE\n"; machines.forEach(m => csv += `2026-05-04,${m.n},${m.p},${m.o}\n`);
+            const b = new Blob([csv], {type:'text/csv'}); const u = URL.createObjectURL(b);
+            const a = document.createElement('a'); a.href = u; a.download = `MES_Rapor.csv`; a.click();
+        }
+
+        function init() {
+            setInterval(() => { $('#live-clock').text(new Date().toLocaleTimeString()); }, 1000);
+            const list = $('#machine-list'), dtList = $('#dt-st-list'), tBody = $('#m-table-body');
+            machines.forEach(m => {
+                $('<div>').addClass('st-card').text(m.n).click(()=>openM(m.id)).appendTo(list);
+                tBody.append(`<tr><td>${m.n}</td><td>Aktif</td><td>%${m.o}</td><td>${m.p}</td></tr>`);
+                $('<button>').addClass('dt-btn').css('background','#555').text(m.n).click(()=>goDtStep2(m.n)).appendTo(dtList);
+            });
+            setInterval(() => { if(!running) return; pCount++; if(Math.random()>0.98) dCount++; $('#kpi-p, #wo-p').text(pCount); $('#kpi-d').text(dCount); $('#kpi-o').text('%'+(pCount>0?((pCount-dCount)/pCount*100).toFixed(1):88)); }, 5000);
+            eChart = new Chart(document.getElementById('chart-energy'), {type:'bar', data:{labels:['01.05','02.05','03.05'], datasets:[{label:'Enerji kW/h', data:[450,520,380], backgroundColor:'#b2b2b2'}]}});
+            oChart = new Chart(document.getElementById('chart-oee'), {type:'line', data:{labels:['1','2','3','4'], datasets:[{label:'OEE%', data:[82,85,84,89], borderColor:'blue'}]}});
+            initCam(); connectWS();
+        }
+
+        function connectWS() { ws = new WebSocket('ws://127.0.0.1:8000/ws'); ws.onmessage = (e) => { const d = JSON.parse(e.data); addLog(d.payload.log_message, d.type==='error_event'?'red':'green'); }; }
+        async function initCam() { const devs = await navigator.mediaDevices.enumerateDevices(); const sel = $('#cam-sel').empty(); devs.filter(d=>d.kind==='videoinput').forEach((c,i)=>$('<option>').val(c.deviceId).text(c.label||`Kamera ${i+1}`).appendTo(sel)); }
+        $('#cam-btn').click(async () => { try { const s = await navigator.mediaDevices.getUserMedia({video:{deviceId:{exact:$('#cam-sel').val()}}}); const v = document.getElementById('webcam-video'); v.srcObject = s; v.style.display='block'; $('#v-box').css('color','transparent'); $('#ai-frame').show(); } catch(e){ alert("HATA!"); } });
+    </script>
+</body>
+</html>
