@@ -390,6 +390,10 @@
         let updateSpeed = 15000; 
         let running = true, pCount = 0, dCount = 0, dtStart = null, dtInt = null, ws = null, selSt = "", eChart, pChart, notifCount = 0;
         let simInterval = null;
+        let totalPlannedDowntime = 0;
+        let totalUnplannedDowntime = 0;
+        let dtType = "";
+        let simStartTime = Date.now();
         
         let machines = [
             {id:'M1', n:'Pres 1', o:88, p:42, t: 65, prod: 1520, def: 12, uptime: '6s 45d'},
@@ -505,22 +509,68 @@
             $('#ds2').removeClass('active'); $('#ds3').addClass('active'); 
             const div = $('#dt-reasons').empty();
             const r = t==='Planlı' ? ['Mola', 'Vardiya Değişimi', 'Planlı Bakım'] : ['Arıza', 'Kalite Sorunu', 'Hammadde Bekleme'];
-            r.forEach(x => { $('<button>').addClass('dt-btn').css('background', t==='Planlı'?'#d97706':'#df2311').text(x).click(() => startDt(x)).appendTo(div); });
+            r.forEach(x => { $('<button>').addClass('dt-btn').css('background', t==='Planlı'?'#d97706':'#df2311').text(x).click(() => startDt(x, t)).appendTo(div); });
         }
-        function startDt(r) { 
-            running = false; dtStart = Date.now(); $('#ds3').removeClass('active'); $('#ds4').addClass('active'); 
+        
+        function calculateOEE() {
+            let now = Date.now();
+            let totalElapsed = Math.floor((now - simStartTime) / 1000);
+            let currentPlanned = 0;
+            let currentUnplanned = 0;
+            if (!running && dtStart) {
+                let currentDtDuration = Math.floor((now - dtStart) / 1000);
+                if (dtType === "Planlı") {
+                    currentPlanned = currentDtDuration;
+                } else {
+                    currentUnplanned = currentDtDuration;
+                }
+            }
+            let plannedProdTime = totalElapsed - (totalPlannedDowntime + currentPlanned);
+            let operatingTime = plannedProdTime - (totalUnplannedDowntime + currentUnplanned);
+            let availability = plannedProdTime > 0 ? (operatingTime / plannedProdTime) : 1.0;
+            if (availability > 1) availability = 1;
+            if (availability < 0) availability = 0;
+            let quality = pCount > 0 ? ((pCount - dCount) / pCount) : 0.92;
+            let performance = 0.96;
+            return (availability * performance * quality * 100).toFixed(1);
+        }
+
+        function updateOeeDisplay() {
+            let oee = calculateOEE();
+            $('#kpi-o').text('%' + oee);
+            $('#wo-q').text('%' + oee);
+        }
+
+        function startDt(r, type) { 
+            running = false; 
+            dtStart = Date.now(); 
+            dtType = type;
+            $('#ds3').removeClass('active'); $('#ds4').addClass('active'); 
             $('#status-card').removeClass('status-ok').css({'border-left-color':'var(--danger)'}).find('h1').css('color','var(--danger)').text("DURUŞ AKTİF: " + selSt); 
             $('#status-card p').text("Sebebi: " + r);
             addLog(`${selSt} İSTASYONU DURDURULDU: ${r}`, 'red'); 
             dtInt = setInterval(() => { 
                 let s = Math.floor((Date.now()-dtStart)/1000); 
                 $('#dt-timer').text(new Date(s*1000).toISOString().substr(11,8)); 
+                updateOeeDisplay();
             }, 1000); 
         }
         function stopDt() { 
-            running = true; clearInterval(dtInt); $('#ds4').removeClass('active'); $('#ds1').addClass('active'); 
+            running = true; 
+            clearInterval(dtInt); 
+            let duration = Math.floor((Date.now() - dtStart) / 1000);
+            if (dtType === "Planlı") {
+                totalPlannedDowntime += duration;
+            } else {
+                totalUnplannedDowntime += duration;
+            }
+            dtStart = null;
+            dtType = "";
+            $('#ds4').removeClass('active'); $('#ds1').addClass('active'); 
             $('#status-card').addClass('status-ok').css({'border-left-color':'var(--success)'}).find('h1').css('color','var(--success)').text("ÜRETİM AKTİF"); 
-            $('#status-card p').text("Sistem senkronize çalışıyor."); addLog(`${selSt} TEKRAR DEVREYE ALINDI`, 'green'); 
+            $('#status-card p').text("Sistem senkronize çalışıyor."); 
+            addLog(`${selSt} TEKRAR DEVREYE ALINDI`, 'green'); 
+            updateOeeDisplay();
         }
 
         async function listCams() { 
@@ -553,7 +603,6 @@
                 $('#cam-text').hide(); 
             } catch(e) { 
                 console.log("Kamera hatası, tablet/mobil fallback devrede:", e);
-                // Tablet (iPad/Safari vb.) kısıtlamalarını aşmak için esnek genel fallback modları
                 try {
                     const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
                     const v = document.getElementById('webcam-video'); 
@@ -612,9 +661,6 @@
             eChart.data.datasets[0].label = mFilter === 'all' ? 'Tesis Toplam Tüketimi (kW/h)' : `${machines.find(m=>m.id===mFilter).n} Tüketimi`;
             eChart.update();
 
-            // PASTA GRAFİĞİ EFEKTİ VE VERİ DEĞİŞİM ÇÖZÜMÜ: 
-            // Seçilen aya göre istasyonların yük dağılımları gerçekçi varyanslarla değiştirildi. 
-            // Chart resetlenerek geçiş esnasında göze çarpan canlı bir animasyon efekti sağlandı.
             pChart.stop();
             if(mFilter === 'all') {
                 pChart.data.labels = machines.map(m => m.n); 
@@ -665,10 +711,9 @@
                 pCount += 1; 
                 if(Math.random() > 0.90) dCount++; 
                 
-                let oee = (pCount>0 ? ((pCount-dCount)/pCount*100).toFixed(1) : 88);
-                
-                $('#kpi-p').text(pCount); $('#kpi-d').text(dCount); $('#kpi-o').text('%' + oee); 
-                $('#wo-p').text(pCount); $('#wo-q').text('%' + oee);
+                $('#kpi-p').text(pCount); $('#kpi-d').text(dCount);
+                $('#wo-p').text(pCount);
+                updateOeeDisplay();
             }, updateSpeed); 
         }
 
@@ -700,6 +745,7 @@
             });
 
             updateEnergyChart();
+            updateOeeDisplay();
 
             try {
                 ws = new WebSocket('wss://meskariyergunu.onrender.com/ws'); 
