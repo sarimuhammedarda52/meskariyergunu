@@ -29,6 +29,7 @@
         /* Üst Menü (Header) */
         header { background-color: var(--card-bg); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--primary-gray); box-shadow: var(--shadow); position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; gap: 10px; }
         .header-left { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .logo { height: 50px; width: auto; object-fit: contain; }
         .clock-box { font-size: 1.4em; font-weight: 700; background: #f0f0f0; padding: 5px 15px; border-radius: 6px; border: 2px solid var(--border); font-family: monospace; }
         .header-right { display: flex; align-items: center; gap: 15px; }
         .operator-photo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
@@ -133,7 +134,10 @@
     <div id="main-dashboard" style="display:none;">
         <header>
             <div class="header-left">
+                <img src="download.png" class="logo" title="SUBÜ" alt="SUBU">
                 <div class="clock-box" id="live-clock">00:00:00</div>
+                <img src="FOTM.jpg" class="logo" title="FOT-M" alt="FOT-M">
+                
                 <div style="display: flex; align-items: center; gap: 8px;" class="header-slogan">
                     <img src="uretimingelecegilogobeyaz.png" class="logo" style="height: 45px;" alt="Slogan">
                     <span style="font-weight: 900; font-size: 0.8em; line-height: 1.2;">ÜRETİMİN GELECEĞİ<br><small style="color:#555;">BİZİM ELİMİZDE</small></span>
@@ -534,11 +538,10 @@
         async function startCam() { 
             try {
                 let id = $('#cam-sel').val();
-                let constraints = { video: { width: { ideal: 1280 }, height: { ideal: 720 } } };
+                let constraints = { video: { playsinline: true, width: { ideal: 1024 }, height: { ideal: 768 } } };
                 
-                // Tablet ve mobil cihazlarda tam uyumluluk sağlamak için exact kaldırıldı, fallback eklendi
-                if(id && id !== "Kamera bulunamadı!") {
-                    constraints.video.deviceId = id;
+                if(id && id !== "Kamera bulunamadı!" && id !== "") {
+                    constraints.video.deviceId = { exact: id };
                 } else {
                     constraints.video.facingMode = "environment";
                 }
@@ -549,15 +552,24 @@
                 v.style.display = 'block'; 
                 $('#cam-text').hide(); 
             } catch(e) { 
-                // İlk yöntem başarısız olursa genel kamera erişimini dener (Örn: Apple/Safari tablet kısıtlamaları için)
+                console.log("Kamera hatası, tablet/mobil fallback devrede:", e);
+                // Tablet (iPad/Safari vb.) kısıtlamalarını aşmak için esnek genel fallback modları
                 try {
-                    const s = await navigator.mediaDevices.getUserMedia({ video: true });
+                    const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
                     const v = document.getElementById('webcam-video'); 
                     v.srcObject = s; 
                     v.style.display = 'block'; 
                     $('#cam-text').hide();
                 } catch(err) {
-                    alert("Kamera bağlantısı sağlanamadı! İzinleri kontrol edin."); 
+                    try {
+                        const s = await navigator.mediaDevices.getUserMedia({ video: true });
+                        const v = document.getElementById('webcam-video'); 
+                        v.srcObject = s; 
+                        v.style.display = 'block'; 
+                        $('#cam-text').hide();
+                    } catch(lastErr) {
+                        alert("Kamera bağlantısı sağlanamadı! Lütfen tarayıcı ayarlarından kamera iznini onaylayın."); 
+                    }
                 }
             }
         }
@@ -600,15 +612,27 @@
             eChart.data.datasets[0].label = mFilter === 'all' ? 'Tesis Toplam Tüketimi (kW/h)' : `${machines.find(m=>m.id===mFilter).n} Tüketimi`;
             eChart.update();
 
+            // PASTA GRAFİĞİ EFEKTİ VE VERİ DEĞİŞİM ÇÖZÜMÜ: 
+            // Seçilen aya göre istasyonların yük dağılımları gerçekçi varyanslarla değiştirildi. 
+            // Chart resetlenerek geçiş esnasında göze çarpan canlı bir animasyon efekti sağlandı.
+            pChart.stop();
             if(mFilter === 'all') {
                 pChart.data.labels = machines.map(m => m.n); 
-                pChart.data.datasets[0].data = machines.map(m => m.p * 24 * 30 * timeMultiplier);
+                pChart.data.datasets[0].data = machines.map((m, index) => {
+                    let monthlyVariance = 0.85 + ((index % 4) * 0.08) + (Math.sin(index + timeMultiplier) * 0.06);
+                    return Math.floor(m.p * 24 * 30 * timeMultiplier * monthlyVariance);
+                });
             } else {
                 pChart.data.labels = ['Seçili İstasyon', 'Diğer İstasyonlar'];
                 let otherP = machines.reduce((sum, m) => sum + m.p, 0) - baseP;
-                pChart.data.datasets[0].data = [(baseP * 24 * 30 * timeMultiplier), (otherP * 24 * 30 * timeMultiplier)];
+                let variance1 = 0.92 + (Math.cos(timeMultiplier) * 0.05);
+                let variance2 = 1.02 - (Math.cos(timeMultiplier) * 0.03);
+                pChart.data.datasets[0].data = [
+                    Math.floor(baseP * 24 * 30 * timeMultiplier * variance1), 
+                    Math.floor(otherP * 24 * 30 * timeMultiplier * variance2)
+                ];
             }
-            pChart.update();
+            pChart.update('active');
         }
 
         function exportExcel() { 
