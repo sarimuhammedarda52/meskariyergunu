@@ -479,11 +479,9 @@
             
             const newRow = `<tr><td>#${randId}</td><td>${name} (${code})</td><td>${client}</td><td>${prioHtml}</td><td>${statusHtml}</td><td>${time}</td><td>${target}</td><td>0</td><td>-</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>`;
             
-            // YENİ GÜNCELLEME: Eğer "ACİL" seçildiyse doğrudan listenin en üstüne (prepend) atıyoruz
             if(priority === 'ACİL') { 
                 $('#wo-tbody').prepend(newRow); 
             } else { 
-                // Normal ise alta ekliyor
                 $('#wo-tbody').append(newRow); 
             }
 
@@ -532,12 +530,38 @@
                 if(!hasVideo) $('<option>').text("Kamera bulunamadı!").appendTo(sel);
             } catch(e) { console.log("Kamera izni yok."); }
         }
+
         async function startCam() { 
             try {
-                const s = await navigator.mediaDevices.getUserMedia({video:{deviceId:{exact:$('#cam-sel').val()}}}); 
-                const v = document.getElementById('webcam-video'); v.srcObject = s; v.style.display = 'block'; $('#cam-text').hide(); 
-            } catch(e) { alert("Kamera açılamadı veya izin verilmedi!"); }
+                let id = $('#cam-sel').val();
+                let constraints = { video: { width: { ideal: 1280 }, height: { ideal: 720 } } };
+                
+                // Tablet ve mobil cihazlarda tam uyumluluk sağlamak için exact kaldırıldı, fallback eklendi
+                if(id && id !== "Kamera bulunamadı!") {
+                    constraints.video.deviceId = id;
+                } else {
+                    constraints.video.facingMode = "environment";
+                }
+                
+                const s = await navigator.mediaDevices.getUserMedia(constraints); 
+                const v = document.getElementById('webcam-video'); 
+                v.srcObject = s; 
+                v.style.display = 'block'; 
+                $('#cam-text').hide(); 
+            } catch(e) { 
+                // İlk yöntem başarısız olursa genel kamera erişimini dener (Örn: Apple/Safari tablet kısıtlamaları için)
+                try {
+                    const s = await navigator.mediaDevices.getUserMedia({ video: true });
+                    const v = document.getElementById('webcam-video'); 
+                    v.srcObject = s; 
+                    v.style.display = 'block'; 
+                    $('#cam-text').hide();
+                } catch(err) {
+                    alert("Kamera bağlantısı sağlanamadı! İzinleri kontrol edin."); 
+                }
+            }
         }
+
         function stopCam() {
             const v = document.getElementById('webcam-video');
             if(v.srcObject) { v.srcObject.getTracks().forEach(track => track.stop()); v.srcObject = null; }
