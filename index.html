@@ -576,7 +576,6 @@
                     <div id="status-card" class="card" style="grid-column: 1/-1; border-left-color:var(--success); text-align:center;">
                         <h1 style="color:var(--success); font-size:3em; font-weight:900;">ÜRETİM AKTİF</h1>
                         <p style="font-weight:bold;">Sistem senkronize çalışıyor.</p>
-                        <button onclick="openHistory()" style="margin-top:15px; background:var(--primary-gray); color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer;">VARDIYA GEÇMİŞİ GÖRÜNTÜLE</button>
                     </div>
                     <div class="card">
                         <h3>TOPLAM ÜRETİM</h3>
@@ -846,29 +845,6 @@
             <div class="card" style="margin:0; padding:12px; border-left-color:#ec4899;">Çevrim Süresi: <span id="det-wo-cycle"></span> sn</div>
         </div>
         <button class="login-btn" style="background:var(--border);" onclick="closeAllModals()">KAPAT</button>
-    </div>
-
-    <div class="modal-box" id="history-modal">
-        <h2 style="margin-bottom: 20px; border-bottom: 2px solid #ccc; padding-bottom:10px; font-weight:900;">VARDİYA ÜRETİM TARİHÇESİ</h2>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Tarih</th>
-                        <th>Vardiya</th>
-                        <th>Üretilen</th>
-                        <th>Fire</th>
-                        <th>Verim</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>29.05.2026</td><td>Gündüz</td><td>2450</td><td>12</td><td>%98.2</td></tr>
-                    <tr><td>30.05.2026</td><td>Gündüz</td><td>2100</td><td>15</td><td>%97.5</td></tr>
-                    <tr><td>31.05.2026</td><td>Gündüz</td><td>2680</td><td>8</td><td>%99.1</td></tr>
-                </tbody>
-            </table>
-        </div>
-        <button class="login-btn" style="margin-top:15px; background:var(--border);" onclick="closeAllModals()">KAPAT</button>
     </div>
 
     <div class="modal-box" id="m-modal" style="max-width: 800px;">
