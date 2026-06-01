@@ -373,7 +373,7 @@
     </div>
 
     <script>
-        let updateSpeed = 15000; 
+        let updateSpeed = 3000; 
         let running = true, pCount = 0, dCount = 0, dtStart = null, dtInt = null, ws = null, selSt = "", eChart, pChart, notifCount = 0;
         let simInterval = null;
         let totalPlannedDowntime = 0;
@@ -440,7 +440,7 @@
         function openM(id) { 
             const m = machines.find(x => x.id === id); 
             $('#modal-name').text(m.n + " İstasyon Verileri"); 
-            $('#m-oee').text('%' + m.o); $('#m-p').text(m.p); $('#m-t').text(m.t);
+            $('#m-oee').text('%' + m.o); $('#m-p').html(`${m.p} <small style="font-size:0.4em; color:#333;">kW/h</small>`); $('#m-t').html(`${m.t} <small style="font-size:0.4em; color:#333;">°C</small>`);
             $('#m-prod').text(m.prod); $('#m-def').text(m.def); $('#m-uptime').text(m.uptime);
             $('#m-overlay, #m-modal').fadeIn(); 
         }
@@ -532,9 +532,9 @@
             if (availability > 1) availability = 1;
             if (availability < 0) availability = 0;
             
-            let quality = pCount > 0 ? ((pCount - dCount) / pCount) : 0.988;
-            if (quality < 0.88) quality = 0.88;
-            let performance = 0.965;
+            let quality = pCount > 0 ? ((pCount - dCount) / pCount) : 0.994;
+            if (quality < 0.95) quality = 0.95;
+            let performance = 0.982;
             
             return (availability * performance * quality * 100).toFixed(1);
         }
@@ -544,23 +544,30 @@
             $('#kpi-o').text('%' + oee);
             $('#wo-q').text('%' + oee);
             
+            const mBody = $('#m-table-body').empty();
+            const mList = $('#machine-list').empty();
+            
             machines.forEach((m, idx) => {
-                let stationVariance = (idx % 2 === 0 ? 0.8 : -1.2) + Math.sin(Date.now() / 15000 + idx) * 0.3;
+                let stationVariance = (idx % 2 === 0 ? 0.4 : -0.6) + Math.sin(Date.now() / 30000 + idx) * 0.1;
                 let calculatedStationOee = (parseFloat(oee) + stationVariance);
                 if (calculatedStationOee > 100) calculatedStationOee = 100;
                 m.o = calculatedStationOee.toFixed(1);
-            });
-            
-            $('#m-table-body').empty();
-            const mBody = $('#m-table-body');
-            machines.forEach(m => {
+                
                 mBody.append(`<tr><td>${m.n}</td><td>${running ? 'Aktif' : 'Duruşta'}</td><td>%${m.o}</td><td>${m.p}</td></tr>`);
+                
+                $('<div class="st-card">')
+                    .html(`<h4 style="color:var(--border);">${m.n}</h4><span style="color:var(--success); font-size:0.8em; font-weight:900;">● Çevrimiçi</span><br><br><small style="font-weight:700;">OEE: %${m.o}</small><br><small style="font-weight:700;">Güç: ${m.p} kW/h</small>`)
+                    .click(() => openM(m.id)).appendTo(mList);
             });
             
             if ($('#m-modal').is(':visible') && selSt) {
                 const m = machines.find(x => x.n === selSt || selSt.includes(x.n));
                 if (m) {
                     $('#m-oee').text('%' + m.o);
+                    $('#m-p').html(`${m.p} <small style="font-size:0.4em; color:#333;">kW/h</small>`);
+                    $('#m-t').html(`${m.t} <small style="font-size:0.4em; color:#333;">°C</small>`);
+                    $('#m-prod').text(m.prod);
+                    $('#m-def').text(m.def);
                 }
             }
         }
@@ -732,8 +739,8 @@
             simInterval = setInterval(() => { 
                 if(!running) return; 
                 
-                pCount += 1; 
-                if(Math.random() > 0.90) dCount++; 
+                pCount += Math.floor(Math.random() * 3) + 4; 
+                if(Math.random() > 0.975) dCount++; 
                 
                 $('#kpi-p').text(pCount); $('#kpi-d').text(dCount);
                 $('#wo-p').text(pCount);
@@ -744,13 +751,9 @@
         function init() {
             setInterval(() => { $('#live-clock').text(new Date().toLocaleTimeString()); }, 1000);
             
-            const mBody = $('#m-table-body'), mList = $('#machine-list'), dtList = $('#dt-st-list'), mFilter = $('#machine-filter');
+            const mFilter = $('#machine-filter');
             machines.forEach(m => {
                 $('<option>').val(m.id).text(m.n).appendTo(mFilter);
-                $('<div class="st-card">')
-                    .html(`<h4 style="color:var(--border);">${m.n}</h4><span style="color:var(--success); font-size:0.8em; font-weight:900;">● Çevrimiçi</span><br><br><small style="font-weight:700;">OEE: %${m.o}</small><br><small style="font-weight:700;">Güç: ${m.p} kW/h</small>`)
-                    .click(() => openM(m.id)).appendTo(mList);
-                $('<button>').addClass('dt-btn').css('background','#555').text(m.n).click(() => goDtStep2(m.n)).appendTo(dtList);
             });
 
             startCounterLoop(); 
@@ -769,6 +772,17 @@
 
             updateEnergyChart();
             updateOeeDisplay();
+
+            setInterval(() => {
+                if(!running) return;
+                machines.forEach(m => {
+                    m.p = Math.max(5, m.p + Math.floor(Math.random() * 5) - 2); 
+                    m.t = Math.max(20, m.t + Math.floor(Math.random() * 3) - 1); 
+                    m.prod += Math.floor(Math.random() * 12) + 8; 
+                    if(Math.random() > 0.96) m.def += 1; 
+                });
+                updateOeeDisplay();
+            }, 60000);
 
             try {
                 ws = new WebSocket('wss://meskariyergunu.onrender.com/ws'); 
