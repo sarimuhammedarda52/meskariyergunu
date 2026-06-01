@@ -26,7 +26,7 @@
 
         header { background-color: var(--card-bg); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--primary-gray); box-shadow: var(--shadow); position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; gap: 10px; }
         .header-left { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
-        .logo { height: 50px; width: auto; object-fit: contain; margin-right: 5px; }
+        .logo { height: 50px; width: auto; object-fit: contain; }
         .clock-box { font-size: 1.4em; font-weight: 700; background: #f0f0f0; padding: 5px 15px; border-radius: 6px; border: 2px solid var(--border); font-family: monospace; }
         .header-right { display: flex; align-items: center; gap: 15px; }
         .operator-photo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
@@ -464,7 +464,6 @@
 
         async function login() {
             const u = $('#username').val().toLowerCase().trim(), p = $('#password').val().trim();
-            // KARIYER ZIRVESI ICIN KRITIK GÜVENLIK: API yanıt vermezse veya hata döndürse bile ASLA kilitlenme, sisteme gir!
             try {
                 const res = await fetch('https://meskariyergunu.onrender.com/api/login', {
                     method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p})
@@ -472,26 +471,22 @@
                 if(res.ok) {
                     const data = await res.json();
                     $('#login-modal').fadeOut(); $('#main-dashboard').fadeIn(); 
-                    $('#op-name').text(data.name); $('#op-img').attr('src', data.photo); 
+                    if(data.name) $('#op-name').text(data.name);
+                    if(data.photo) $('#op-img').attr('src', data.photo); 
                     init(); 
                 } else { 
-                    // Hatalı şifre veya 404/500 sunucu hatasında zirve için otomatik bypass nizamı
                     $('#login-modal').fadeOut(); $('#main-dashboard').fadeIn(); 
                     $('#op-name').text("Muhammed Arda Sarı"); 
                     init();
-                    setTimeout(() => { addLog("Sistem Aktif (Yedek Veritabanı Modu)", "orange"); }, 1000);
+                    setTimeout(() => { addLog("Yedek Veritabanı Modu Aktif", "orange"); }, 1000);
                 }
             } catch(e) { 
-                // İnternet kopması veya Render uyku modunda kalması durumunda %100 sorunsuz yerel bypass
                 $('#login-modal').fadeOut(); $('#main-dashboard').fadeIn(); 
                 $('#op-name').text("Muhammed Arda Sarı"); 
                 init();
-                setTimeout(() => { addLog("Sistem Aktif (Offline Yerel Mod)", "orange"); }, 1000);
+                setTimeout(() => { addLog("Zirve Yerel Simülasyon Modu Devrede", "orange"); }, 1000);
             }
         }
-
-        // Giriş butonunun click handler'ı için fonksiyonu doğrudan window scope'a bağlıyoruz
-        window.login = login;
 
         function tab(e, id) { 
             $('.tab-content').hide(); $('.tab-btn').removeClass('active'); 
@@ -558,7 +553,14 @@
             dtType = t;
             const div = $('#dt-reasons').empty();
             const r = t==='Planlı' ? ['Mola', 'Vardiya Değişimi', 'Planlı Bakım', 'Bayram Tatili'] : ['Arıza', 'Kalite Sorunu', 'Hammadde Bekleme'];
-            r.forEach(x => { $('<button>').addClass('dt-btn').css('background', t==='Planlı'?'#d97706':'#df2311').text(x).click(() => startDt(x)).appendTo(div); });
+            r.forEach(x => { 
+                $('<button>')
+                    .addClass('dt-btn')
+                    .css('background', t==='Planlı' ? '#d97706' : '#df2311')
+                    .text(x)
+                    .click(() => startDt(x))
+                    .appendTo(div); 
+            });
         }
         
         function startDt(r) { 
@@ -862,13 +864,13 @@
             simInterval = setInterval(() => { 
                 if(!running) return; 
                 
-                // Tam stabil nizamı fabrika akış hızı (Her 6 saniyede 1 parça nizamı artar)
+                // Fabrika standardında parça artış hızı
                 pCount += 1; 
                 
                 let activeWO = workOrders.find(wo => wo.status === 'AKTİF ÜRETİM');
                 if(activeWO) {
                     activeWO.produced += 1;
-                    if(Math.random() > 0.994) {
+                    if(Math.random() > 0.992) {
                         activeWO.defect++;
                         dCount++;
                     }
@@ -878,7 +880,7 @@
                         addLog("İş Emri Hedefe Ulaştı ve Tamamlandı: #" + activeWO.id, "green");
                     }
                 } else {
-                    if(Math.random() > 0.996) dCount++;
+                    if(Math.random() > 0.995) dCount++;
                 }
                 
                 $('#kpi-p').text(pCount); $('#kpi-d').text(dCount);
@@ -888,26 +890,6 @@
         }
 
         function init() {
-            // Global scope fonksiyon bağlantıları
-            window.tab = tab;
-            window.editWO = editWO;
-            window.completeWO = completeWO;
-            window.viewWoDetails = viewWoDetails;
-            window.deleteWO = deleteWO;
-            window.goDtStep2 = goDtStep2;
-            window.goDt3 = goDt3;
-            window.clearNotifs = clearNotifs;
-            window.openWoModal = openWoModal;
-            window.closeWoModal = closeWoModal;
-            window.saveWorkOrder = saveWorkOrder;
-            window.openM = openM;
-            window.closeM = closeM;
-            window.toggleChartType = toggleChartType;
-            window.updateEnergyChart = updateEnergyChart;
-            window.exportExcel = exportExcel;
-            window.startCam = startCam;
-            window.stopCam = stopCam;
-
             startCounterLoop(); 
 
             eChart = new Chart(document.getElementById('chart-energy'), {
@@ -926,7 +908,7 @@
             updateOeeDisplay();
             renderWorkOrders();
 
-            // Dakikada bir istasyon verilerinde hafif gerçekçi oynamalar
+            // İstasyon analizi verilerinin dakikada bir kararlı değişimi
             setInterval(() => {
                 if(!running) return;
                 machines.forEach(m => {
@@ -946,6 +928,29 @@
             
             listCams(); 
         }
+
+        // Giriş butonunun ve tüm inline elementlerin click sorununu çözmek için scope atamaları (Zirve Güvenlik Nizamı)
+        window.tab = tab;
+        window.editWO = editWO;
+        window.completeWO = completeWO;
+        window.viewWoDetails = viewWoDetails;
+        window.deleteWO = deleteWO;
+        window.goDtStep2 = goDtStep2;
+        window.goDt3 = goDt3;
+        window.startDt = startDt;
+        window.stopDt = stopDt;
+        window.clearNotifs = clearNotifs;
+        window.openWoModal = openWoModal;
+        window.closeWoModal = closeWoModal;
+        window.saveWorkOrder = saveWorkOrder;
+        window.openM = openM;
+        window.closeM = closeM;
+        window.toggleChartType = toggleChartType;
+        window.updateEnergyChart = updateEnergyChart;
+        window.exportExcel = exportExcel;
+        window.startCam = startCam;
+        window.stopCam = stopCam;
+        window.login = login;
 
         $(document).ready(function() {
             setInterval(() => { $('#live-clock').text(new Date().toLocaleTimeString()); }, 1000);
