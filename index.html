@@ -52,12 +52,14 @@
         th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; font-weight: 700; font-size: 0.9em; vertical-align: middle; }
         th { background: #f8f8f8; color: #555; }
         .del-btn { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85em; }
+        .action-btn { color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85em; margin-right: 4px; }
 
         .video-box { width: 100%; height: 450px; background: #000; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; position: relative; overflow: hidden; }
         #webcam-video { width: 100%; height: 100%; object-fit: cover; display: none; }
 
         .modal-box { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 95vw; max-width: 800px; background: white; z-index: 9000; padding: 30px; border-radius: 12px; border: 3px solid var(--border); box-shadow: 0 0 150px rgba(0,0,0,0.8); max-height: 90vh; overflow-y: auto; }
         #wo-modal { max-width: 600px; }
+        #wo-details-modal { max-width: 700px; }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 8500; }
         .form-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #ddd; border-radius: 6px; font-weight: bold; font-size: 1em; }
 
@@ -177,20 +179,23 @@
             <div id="t-wo" class="tab-content" style="display:none;">
                 <div class="card">
                     <h3>
-                        İŞ EMİRLERİ LİSTESİ
+                        AKTİF VE BEKLEYEN İŞ EMİRLERİ
                         <button onclick="openWoModal()" style="background:var(--success); color:white; border:none; padding:8px 15px; border-radius:6px; font-weight:900; font-size:0.8em; cursor:pointer;">+ YENİ İŞ EMRİ</button>
                     </h3>
                     <div class="table-container">
                         <table>
-                            <thead><tr><th>No</th><th>Ürün (Kod)</th><th>Müşteri</th><th>Öncelik</th><th>Durum</th><th>Başlangıç</th><th>Hedef</th><th>Üretilen</th><th>Kalite %</th><th>İşlem</th></tr></thead>
-                            <tbody id="wo-tbody">
-                                <tr><td>#7822</td><td>PLC KONTROL KARTI (P-101)</td><td>-</td><td><span style="color:red; font-weight:bold;">ACİL</span></td><td><span style="color:green; font-weight:bold;">AKTİF ÜRETİM</span></td><td>08:00</td><td>2500</td><td id="wo-p" style="font-weight:900; color:var(--danger);">0</td><td id="wo-q">%99.5</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
-                                <tr><td>#7824</td><td>PNÖMATİK VALF (S-440)</td><td>-</td><td><span style="color:red; font-weight:bold;">ACİL</span></td><td><span style="color:orange; font-weight:bold;">BEKLEYEN</span></td><td>13:00</td><td>150</td><td>0</td><td>-</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
-                                
-                                <tr><td>#7819</td><td>SENSÖR MODÜLÜ (S-202)</td><td>-</td><td>NORMAL</td><td><span style="color:#555; font-weight:bold;">TAMAMLANDI</span></td><td>02:00</td><td>800</td><td>800</td><td>%99.8</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
-                                <tr><td>#7820</td><td>SERVO MOTOR SÜRÜCÜ (G-305)</td><td>-</td><td>NORMAL</td><td><span style="color:#555; font-weight:bold;">TAMAMLANDI</span></td><td>04:00</td><td>1000</td><td>1000</td><td>%98.8</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
-                                <tr><td>#7823</td><td>REDÜKTÖR DİŞLİSİ (M-110)</td><td>-</td><td>NORMAL</td><td><span style="color:orange; font-weight:bold;">BEKLEYEN</span></td><td>11:00</td><td>300</td><td>0</td><td>-</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>
-                            </tbody>
+                            <thead><tr><th>No</th><th>Ürün (Kod)</th><th>Müşteri</th><th>Öncelik</th><th>Durum</th><th>Başlangıç</th><th>Hedef</th><th>Üretilen</th><th>Kalite %</th><th>İşlemler</th></tr></thead>
+                            <tbody id="wo-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h3>TAMAMLANAN İŞ EMİRLERİ</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>No</th><th>Ürün (Kod)</th><th>Müşteri</th><th>Öncelik</th><th>Durum</th><th>Başlangıç</th><th>Bitiş</th><th>Hedef</th><th>Üretilen</th><th>Fire</th><th>İşlem</th></tr></thead>
+                            <tbody id="wo-completed-tbody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -300,7 +305,7 @@
 
     <div class="overlay" id="wo-overlay" onclick="closeWoModal()"></div>
     <div class="modal-box" id="wo-modal">
-        <h2 style="margin-bottom: 20px; border-bottom: 2px solid #ccc; padding-bottom:10px; font-weight:900;">YENİ İŞ EMRİ OLUŞTUR</h2>
+        <h2 id="wo-modal-title" style="margin-bottom: 20px; border-bottom: 2px solid #ccc; padding-bottom:10px; font-weight:900;">YENİ İŞ EMRİ OLUŞTUR</h2>
         
         <div style="display:flex; gap:10px;">
             <div style="flex:1;">
@@ -313,8 +318,16 @@
             </div>
         </div>
 
-        <label style="font-weight:bold; display:block; margin-bottom:5px;">Müşteri / Sipariş Veren:</label>
-        <input type="text" id="m-wo-client" class="form-input" value="-">
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1;">
+                <label style="font-weight:bold; display:block; margin-bottom:5px;">Müşteri:</label>
+                <input type="text" id="m-wo-client" class="form-input" value="-">
+            </div>
+            <div style="flex:1;">
+                <label style="font-weight:bold; display:block; margin-bottom:5px;">Operatör:</label>
+                <input type="text" id="m-wo-op" class="form-input" value="Muhammed Arda Sarı">
+            </div>
+        </div>
         
         <div style="display:flex; gap:10px;">
             <div style="flex:1;">
@@ -330,14 +343,41 @@
             </div>
         </div>
 
-        <label style="font-weight:bold; display:block; margin-bottom:5px;">Başlangıç Durumu:</label>
-        <select id="m-wo-status" class="form-input">
-            <option value="BEKLEYEN">Bekleyen</option>
-            <option value="AKTİF ÜRETİM">Aktif Üretim</option>
-        </select>
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1;">
+                <label style="font-weight:bold; display:block; margin-bottom:5px;">Başlangıç Durumu:</label>
+                <select id="m-wo-status" class="form-input">
+                    <option value="BEKLEYEN">Bekleyen</option>
+                    <option value="AKTİF ÜRETİM">Aktif Üretim</option>
+                </select>
+            </div>
+            <div style="flex:1;">
+                <label style="font-weight:bold; display:block; margin-bottom:5px;">Çevrim Süresi (sn):</label>
+                <input type="text" id="m-wo-cycle" class="form-input" value="1.5">
+            </div>
+        </div>
         
         <button class="login-btn" style="background:var(--success);" onclick="saveWorkOrder()">KAYDET VE LİSTEYE EKLE</button>
         <button class="login-btn" style="background:var(--danger); margin-top:10px;" onclick="closeWoModal()">İPTAL</button>
+    </div>
+
+    <div class="modal-box" id="wo-details-modal">
+        <h2 style="margin-bottom: 20px; border-bottom: 2px solid #ccc; padding-bottom:10px; font-weight:900; color:var(--text-main);">İŞ EMRİ DETAY ANALİZİ (MES)</h2>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:15px; margin-bottom:20px; font-size:1.05em; font-weight:700;">
+            <div class="card" style="margin:0; padding:12px; border-left-color:var(--danger);">İş Emri No: <span id="det-wo-id" style="color:var(--danger);"></span></div>
+            <div class="card" style="margin:0; padding:12px; border-left-color:var(--success);">Durum: <span id="det-wo-status" style="color:var(--success);"></span></div>
+            <div class="card" style="margin:0; padding:12px; border-left-color:#3b82f6;">Ürün Adı: <span id="det-wo-name"></span></div>
+            <div class="card" style="margin:0; padding:12px; border-left-color:#3b82f6;">Ürün Kodu: <span id="det-wo-code"></span></div>
+            <div class="card" style="margin:0; padding:12px; border-left-color:#8b5cf6;">Müşteri: <span id="det-wo-client"></span></div>
+            <div class="card" style="margin:0; padding:12px; border-left-color:var(--warning);">Öncelik: <span id="det-wo-priority"></span></div>
+            <div class="card" style="margin:0; padding:12px; border-left-color:#555;">Zaman Çizelgesi: <span id="det-wo-times"></span></div>
+            <div class="card" style="margin:0; padding:12px; border-left-color:#10b981;">Sorumlu Operatör: <span id="det-wo-op"></span></div>
+            <div class="card" style="margin:0; padding:12px; border-left-color:#14b8a6;">Hedef Miktar: <span id="det-wo-target"></span></div>
+            <div class="card" style="margin:0; padding:12px; border-left-color:var(--success);">Mevcut Üretim: <span id="det-wo-prod"></span></div>
+            <div class="card" style="margin:0; padding:12px; border-left-color:var(--danger);">Kalite Firesi: <span id="det-wo-def"></span></div>
+            <div class="card" style="margin:0; padding:12px; border-left-color:#ec4899;">Çevrim Süresi: <span id="det-wo-cycle"></span> sn</div>
+        </div>
+        <button class="login-btn" style="background:var(--border);" onclick="$('#wo-overlay, #wo-details-modal').fadeOut();">KAPAT</button>
     </div>
 
     <div class="overlay" id="m-overlay" onclick="closeM()"></div>
@@ -381,6 +421,16 @@
         let dtType = "";
         let simStartTime = Date.now();
         let holidayDowntimeAllowance = 172800;
+        let editingWoId = null;
+
+        let workOrders = [
+            {id: 7822, code: 'P-101', name: 'PLC KONTROL KARTI', client: 'ARÇELİK', priority: 'ACİL', status: 'AKTİF ÜRETİM', time: '08:00', endTime: '-', target: 2500, produced: 420, defect: 1, op: 'Muhammed Arda Sarı', cycle: '1.2'},
+            {id: 7824, code: 'S-440', name: 'PNÖMATİK VALF', client: 'VESTEL', priority: 'ACİL', status: 'BEKLEYEN', time: '13:00', endTime: '-', target: 150, produced: 0, defect: 0, op: 'Muhammed Arda Sarı', cycle: '1.8'},
+            {id: 7823, code: 'M-110', name: 'REDÜKTÖR DİŞLİSİ', client: 'SANAYİ', priority: 'NORMAL', status: 'BEKLEYEN', time: '11:00', endTime: '-', target: 300, produced: 0, defect: 0, op: 'Hakan Çelik', cycle: '2.5'},
+            {id: 7819, code: 'S-202', name: 'SENSÖR MODÜLÜ', client: 'BOSH', priority: 'NORMAL', status: 'TAMAMLANDI', time: '02:00', endTime: '06:30', target: 800, produced: 800, defect: 2, op: 'Ahmet Yılmaz', cycle: '1.5'},
+            {id: 7820, code: 'G-305', name: 'SERVO MOTOR SÜRÜCÜ', client: 'SIEMENS', priority: 'NORMAL', status: 'TAMAMLANDI', time: '04:00', endTime: '09:15', target: 1000, produced: 1000, defect: 5, op: 'Can Tekin', cycle: '2.0'},
+            {id: 7815, code: 'H-902', name: 'HİDROLİK POMPA GÖVDESİ', client: 'ROBOTİK A.Ş.', priority: 'NORMAL', status: 'TAMAMLANDI', time: '22:00', endTime: '03:45', target: 500, produced: 500, defect: 1, op: 'Efe Şen', cycle: '3.0'}
+        ];
         
         let machines = [
             {id:'M1', n:'Pres 1', o:88, p:42, t: 65, prod: 1520, def: 12, uptime: '6s 45d'},
@@ -447,57 +497,166 @@
         function closeM() { $('#m-overlay, #m-modal').fadeOut(); }
 
         function openWoModal() {
+            editingWoId = null;
+            $('#wo-modal-title').text('YENİ İŞ EMRİ OLUŞTUR');
             $('.form-input').val(''); 
             $('#m-wo-client').val('-'); 
+            $('#m-wo-op').val('Muhammed Arda Sarı');
             $('#m-wo-priority').val('NORMAL');
             $('#m-wo-status').val('BEKLEYEN');
+            $('#m-wo-cycle').val('1.5');
             $('#wo-overlay, #wo-modal').fadeIn();
         }
         function closeWoModal() { $('#wo-overlay, #wo-modal').fadeOut(); }
         
+        function renderWorkOrders() {
+            const activeBody = $('#wo-tbody').empty();
+            const completedBody = $('#wo-completed-tbody').empty();
+
+            workOrders.forEach(wo => {
+                let prioHtml = wo.priority === 'ACİL' ? `<span style="color:red; font-weight:bold;">ACİL</span>` : `NORMAL`;
+                let statusColor = 'orange';
+                if(wo.status === 'AKTİF ÜRETİM') statusColor = 'green';
+                if(wo.status === 'TAMAMLANDI') statusColor = '#555';
+                let statusHtml = `<span style="color:${statusColor}; font-weight:bold;">${wo.status}</span>`;
+                
+                let qualityPercent = wo.produced > 0 ? (((wo.produced - wo.defect) / wo.produced) * 100).toFixed(1) : '100.0';
+
+                if(wo.status === 'TAMAMLANDI') {
+                    const row = `<tr>
+                        <td>#${wo.id}</td>
+                        <td>${wo.name} (${wo.code})</td>
+                        <td>${wo.client}</td>
+                        <td>${prioHtml}</td>
+                        <td>${statusHtml}</td>
+                        <td>${wo.time}</td>
+                        <td>${wo.endTime}</td>
+                        <td>${wo.target}</td>
+                        <td>${wo.produced}</td>
+                        <td style="color:var(--danger);">${wo.defect}</td>
+                        <td>
+                            <button class="action-btn" style="background:#3b82f6;" onclick="viewWoDetails(${wo.id})">🔍 Detay</button>
+                            <button class="del-btn" onclick="deleteWO(${wo.id})">🗑️</button>
+                        </td>
+                    </tr>`;
+                    completedBody.append(row);
+                } else {
+                    let completeBtn = wo.status === 'AKTİF ÜRETİM' ? `<button class="action-btn" style="background:var(--success);" onclick="completeWO(${wo.id})">✅ Bitir</button>` : '';
+                    const row = `<tr>
+                        <td>#${wo.id}</td>
+                        <td>${wo.name} (${wo.code})</td>
+                        <td>${wo.client}</td>
+                        <td>${prioHtml}</td>
+                        <td>${statusHtml}</td>
+                        <td>${wo.time}</td>
+                        <td>${wo.target}</td>
+                        <td style="font-weight:900; color:var(--danger);">${wo.produced}</td>
+                        <td>%${qualityPercent}</td>
+                        <td>
+                            <button class="action-btn" style="background:#3b82f6;" onclick="viewWoDetails(${wo.id})">🔍 Detay</button>
+                            <button class="action-btn" style="background:var(--warning);" onclick="editWO(${wo.id})">✏️ Düzenle</button>
+                            ${completeBtn}
+                            <button class="del-btn" onclick="deleteWO(${wo.id})">🗑️</button>
+                        </td>
+                    </tr>`;
+                    activeBody.append(row);
+                }
+            });
+        }
+
         function saveWorkOrder() {
             const code = $('#m-wo-code').val().trim().toUpperCase() || '-';
             const name = $('#m-wo-name').val().trim().toUpperCase();
             const client = $('#m-wo-client').val().trim().toUpperCase() || '-';
-            const target = $('#m-wo-target').val();
+            const op = $('#m-wo-op').val().trim() || 'Muhammed Arda Sarı';
+            const target = parseInt($('#m-wo-target').val()) || 0;
             const priority = $('#m-wo-priority').val();
             const status = $('#m-wo-status').val();
-            const time = new Date().toLocaleTimeString().substr(0,5);
-            const randId = Math.floor(Math.random() * 9000) + 1000; 
+            const cycle = $('#m-wo-cycle').val() || '1.5';
             
             if(!name || !target) { alert("Lütfen ürün adı ve hedef miktar girin!"); return; }
 
-            let prioHtml = priority === 'ACİL' ? `<span style="color:red; font-weight:bold;">ACİL</span>` : `NORMAL`;
-            let statusHtml = status === 'BEKLEYEN' 
-                ? `<span style="color:orange; font-weight:bold;">BEKLEYEN</span>` 
-                : `<span style="color:green; font-weight:bold;">AKTİF ÜRETİM</span>`;
-            
-            const newRow = `<tr><td>#${randId}</td><td>${name} (${code})</td><td>${client}</td><td>${prioHtml}</td><td>${statusHtml}</td><td>${time}</td><td>${target}</td><td>0</td><td>-</td><td><button class="del-btn" onclick="deleteWO(this)">🗑️</button></td></tr>`;
-            
-            if(priority === 'ACİL') { 
-                $('#wo-tbody').prepend(newRow); 
-            } else { 
-                $('#wo-tbody').append(newRow); 
+            if(status === 'AKTİF ÜRETİM') {
+                workOrders.forEach(wo => {
+                    if(wo.status === 'AKTİF ÜRETİM') wo.status = 'BEKLEYEN';
+                });
             }
 
-            addLog(`Manuel İş Emri Eklendi: #${randId} - ${name}`, 'green');
+            if(editingWoId !== null) {
+                let wo = workOrders.find(x => x.id === editingWoId);
+                if(wo) {
+                    wo.code = code; wo.name = name; wo.client = client; wo.op = op;
+                    wo.target = target; wo.priority = priority; wo.status = status; wo.cycle = cycle;
+                    addLog(`İş Emri Güncellendi: #${wo.id}`, 'blue');
+                }
+            } else {
+                const randId = Math.floor(Math.random() * 9000) + 1000; 
+                const time = new Date().toLocaleTimeString().substr(0,5);
+                const newWo = {
+                    id: randId, code: code, name: name, client: client, priority: priority,
+                    status: status, time: time, endTime: '-', target: target, produced: 0, defect: 0, op: op, cycle: cycle
+                };
+                if(priority === 'ACİL') { workOrders.unshift(newWo); } else { workOrders.push(newWo); }
+                addLog(`Yeni İş Emri Eklendi: #${randId} - ${name}`, 'green');
+            }
+            
             closeWoModal();
+            renderWorkOrders();
         }
 
-        function deleteWO(btn) {
-            if(confirm("Bu iş emrini listeden silmek istediğinize emin misiniz?")) {
-                $(btn).closest('tr').fadeOut(300, function() { $(this).remove(); });
-                addLog("İş Emri listeden silindi.", "orange");
+        function editWO(id) {
+            let wo = workOrders.find(x => x.id === id);
+            if(!wo) return;
+            editingWoId = id;
+            $('#wo-modal-title').text(`İŞ EMRİ DÜZENLE: #${id}`);
+            $('#m-wo-code').val(wo.code);
+            $('#m-wo-name').val(wo.name);
+            $('#m-wo-client').val(wo.client);
+            $('#m-wo-op').val(wo.op);
+            $('#m-wo-target').val(wo.target);
+            $('#m-wo-priority').val(wo.priority);
+            $('#m-wo-status').val(wo.status);
+            $('#m-wo-cycle').val(wo.cycle);
+            $('#wo-overlay, #wo-modal').fadeIn();
+        }
+
+        function completeWO(id) {
+            let wo = workOrders.find(x => x.id === id);
+            if(wo) {
+                wo.status = 'TAMAMLANDI';
+                wo.endTime = new Date().toLocaleTimeString().substr(0,5);
+                addLog(`İş Emri Tamamlandı: #${id}`, 'green');
+                renderWorkOrders();
             }
         }
 
-        function goDtStep2(n) { 
-            selSt = n; 
-            $('#dt-sel-st').text(n); 
-            $('#ds1').removeClass('active'); 
-            $('#ds2').addClass('active'); 
+        function viewWoDetails(id) {
+            let wo = workOrders.find(x => x.id === id);
+            if(!wo) return;
+            $('#det-wo-id').text(`#${wo.id}`);
+            $('#det-wo-status').text(wo.status);
+            $('#det-wo-name').text(wo.name);
+            $('#det-wo-code').text(wo.code);
+            $('#det-wo-client').text(wo.client);
+            $('#det-wo-priority').text(wo.priority);
+            $('#det-wo-times').text(`${wo.time} / ${wo.endTime}`);
+            $('#det-wo-op').text(wo.op);
+            $('#det-wo-target').text(wo.target);
+            $('#det-wo-prod').text(wo.produced);
+            $('#det-wo-def').text(wo.defect);
+            $('#det-wo-cycle').text(wo.cycle);
+            $('#wo-overlay, #wo-details-modal').fadeIn();
         }
-        
+
+        function deleteWO(id) {
+            if(confirm("Bu iş emrini listeden silmek istediğinize emin misiniz?")) {
+                workOrders = workOrders.filter(x => x.id !== id);
+                addLog(`İş Emri #${id} silindi.`, "orange");
+                renderWorkOrders();
+            }
+        }
+
+        function goDtStep2(n) { selSt = n; $('#dt-sel-st').text(n); $('#ds1').removeClass('active'); $('#ds2').addClass('active'); }
         function goDt3(t) {
             $('#ds2').removeClass('active'); $('#ds3').addClass('active'); 
             const div = $('#dt-reasons').empty();
@@ -542,7 +701,6 @@
         function updateOeeDisplay() {
             let oee = calculateOEE();
             $('#kpi-o').text('%' + oee);
-            $('#wo-q').text('%' + oee);
             
             const mBody = $('#m-table-body').empty();
             const mList = $('#machine-list').empty();
@@ -576,7 +734,7 @@
             running = false; 
             dtStart = Date.now(); 
             dtType = type;
-            $('#ds3').removeClass('active'); $('#ds4').active || $('#ds4').addClass('active'); 
+            $('#ds3').removeClass('active'); $('#ds4').addClass('active'); 
             $('#status-card').removeClass('status-ok').css({'border-left-color':'var(--danger)'}).find('h1').css('color','var(--danger)').text("DURUŞ AKTİF: " + selSt); 
             $('#status-card p').text("Sebebi: " + r);
             addLog(`${selSt} İSTASYONU DURDURULDU: ${r}`, 'red'); 
@@ -739,12 +897,27 @@
             simInterval = setInterval(() => { 
                 if(!running) return; 
                 
-                pCount += Math.floor(Math.random() * 5) + 8; 
-                if(Math.random() > 0.988) dCount++; 
+                pCount += 5; 
+                
+                let activeWO = workOrders.find(wo => wo.status === 'AKTİF ÜRETİM');
+                if(activeWO) {
+                    activeWO.produced += 5;
+                    if(Math.random() > 0.985) {
+                        activeWO.defect++;
+                        dCount++;
+                    }
+                    if(activeWO.produced >= activeWO.target) {
+                        activeWO.status = 'TAMAMLANDI';
+                        activeWO.endTime = new Date().toLocaleTimeString().substr(0,5);
+                        addLog(`İş Emri Hedefe Ulaştı ve Tamamlandı: #${activeWO.id}`, 'green');
+                    }
+                } else {
+                    if(Math.random() > 0.988) dCount++;
+                }
                 
                 $('#kpi-p').text(pCount); $('#kpi-d').text(dCount);
-                $('#wo-p').text(pCount);
                 updateOeeDisplay();
+                renderWorkOrders();
             }, updateSpeed); 
         }
 
@@ -772,14 +945,15 @@
 
             updateEnergyChart();
             updateOeeDisplay();
+            renderWorkOrders();
 
             setInterval(() => {
                 if(!running) return;
                 machines.forEach(m => {
                     m.p = Math.max(5, m.p + Math.floor(Math.random() * 5) - 2); 
                     m.t = Math.max(20, m.t + Math.floor(Math.random() * 3) - 1); 
-                    m.prod += Math.floor(Math.random() * 25) + 30; 
-                    if(Math.random() > 0.993) m.def += 1; 
+                    m.prod += 5; 
+                    if(Math.random() > 0.995) m.def += 1; 
                 });
                 updateOeeDisplay();
             }, 60000);
