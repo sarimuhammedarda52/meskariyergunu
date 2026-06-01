@@ -418,7 +418,6 @@
         let updateSpeed = 4000; 
         let running = true, pCount = 0, dCount = 0, dtStart = null, dtInt = null, ws = null, selSt = "", eChart, pChart, notifCount = 0;
         let simInterval = null;
-        let dtType = "";
         let simStartTime = Date.now();
         let editingWoId = null;
 
@@ -655,6 +654,7 @@
             }
         }
 
+        /* TAMPONSUZ VE ORİJİNAL DURUŞ YÖNETİMİ FONKSİYONLARI */
         function goDtStep2(n) { selSt = n; $('#dt-sel-st').text(n); $('#ds1').removeClass('active'); $('#ds2').addClass('active'); }
         
         function goDt3(t) {
