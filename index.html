@@ -323,7 +323,7 @@
         <div style="display:flex; gap:10px;">
             <div style="flex:1;">
                 <label style="font-weight:bold; display:block; margin-bottom:5px;">Müşteri:</label>
-                <input type="text" id="m-wo-client" class="form-input" value="-" readonly>
+                <input type="text" id="m-wo-client" class="form-input" value="-">
             </div>
             <div style="flex:1;">
                 <label style="font-weight:bold; display:block; margin-bottom:5px;">Operatör:</label>
@@ -370,7 +370,7 @@
             <div class="card" style="margin:0; padding:12px; border-left-color:var(--success);">Durum: <span id="det-wo-status" style="color:var(--success);"></span></div>
             <div class="card" style="margin:0; padding:12px; border-left-color:#3b82f6;">Ürün Adı: <span id="det-wo-name"></span></div>
             <div class="card" style="margin:0; padding:12px; border-left-color:#3b82f6;">Ürün Kodu: <span id="det-wo-code"></span></div>
-            <div class="card" style="margin:0; padding:12px; border-left-color:#8b5cf6;">Müşteri: <span id="det-wo-client">-</span></div>
+            <div class="card" style="margin:0; padding:12px; border-left-color:#8b5cf6;">Müşteri: <span id="det-wo-client"></span></div>
             <div class="card" style="margin:0; padding:12px; border-left-color:var(--warning);">Öncelik: <span id="det-wo-priority"></span></div>
             <div class="card" style="margin:0; padding:12px; border-left-color:#555;">Zaman Çizelgesi: <span id="det-wo-times"></span></div>
             <div class="card" style="margin:0; padding:12px; border-left-color:#10b981;">Sorumlu Operatör: <span id="det-wo-op"></span></div>
@@ -418,6 +418,13 @@
         let updateSpeed = 4000; 
         let running = true, pCount = 0, dCount = 0, dtStart = null, dtInt = null, ws = null, selSt = "", eChart, pChart, notifCount = 0;
         let simInterval = null;
+        
+        let historicalPlannedSeconds = 3600; 
+        let historicalUnplannedSeconds = 1200; 
+        let livePlannedSeconds = 0;
+        let liveUnplannedSeconds = 0;
+        
+        let dtType = "";
         let simStartTime = Date.now();
         let editingWoId = null;
 
@@ -524,7 +531,7 @@
                     const row = `<tr>
                         <td>#${wo.id}</td>
                         <td>${wo.name} (${wo.code})</td>
-                        <td>-</td>
+                        <td>${wo.client}</td>
                         <td>${prioHtml}</td>
                         <td>${statusHtml}</td>
                         <td>${wo.time}</td>
@@ -543,7 +550,7 @@
                     const row = `<tr>
                         <td>#${wo.id}</td>
                         <td>${wo.name} (${wo.code})</td>
-                        <td>-</td>
+                        <td>${wo.client}</td>
                         <td>${prioHtml}</td>
                         <td>${statusHtml}</td>
                         <td>${wo.time}</td>
@@ -565,7 +572,7 @@
         function saveWorkOrder() {
             const code = $('#m-wo-code').val().trim().toUpperCase() || '-';
             const name = $('#m-wo-name').val().trim().toUpperCase();
-            const client = '-';
+            const client = $('#m-wo-client').val().trim().toUpperCase() || '-';
             const op = $('#m-wo-op').val().trim() || 'Muhammed Arda Sarı';
             const target = parseInt($('#m-wo-target').val()) || 0;
             const priority = $('#m-wo-priority').val();
@@ -609,7 +616,7 @@
             $('#wo-modal-title').text(`İŞ EMRİ DÜZENLE: #${id}`);
             $('#m-wo-code').val(wo.code);
             $('#m-wo-name').val(wo.name);
-            $('#m-wo-client').val('-');
+            $('#m-wo-client').val(wo.client);
             $('#m-wo-op').val(wo.op);
             $('#m-wo-target').val(wo.target);
             $('#m-wo-priority').val(wo.priority);
@@ -635,7 +642,7 @@
             $('#det-wo-status').text(wo.status);
             $('#det-wo-name').text(wo.name);
             $('#det-wo-code').text(wo.code);
-            $('#det-wo-client').text('-');
+            $('#det-wo-client').text(wo.client);
             $('#det-wo-priority').text(wo.priority);
             $('#det-wo-times').text(`${wo.time} / ${wo.endTime}`);
             $('#det-wo-op').text(wo.op);
@@ -654,36 +661,33 @@
             }
         }
 
-        /* TAMPONSUZ VE ORİJİNAL DURUŞ YÖNETİMİ FONKSİYONLARI */
-        function goDtStep2(n) { selSt = n; $('#dt-sel-st').text(n); $('#ds1').removeClass('active'); $('#ds2').addClass('active'); }
+        function goDtStep2(n) { 
+            selSt = n; 
+            $('#dt-sel-st').text(n); 
+            $('#ds1').removeClass('active'); 
+            $('#ds2').addClass('active'); 
+        }
         
         function goDt3(t) {
             $('#ds2').removeClass('active'); $('#ds3').addClass('active'); 
+            dtType = t;
             const div = $('#dt-reasons').empty();
-            const r = t==='Planlı' ? ['Mola', 'Vardiya Değişimi', 'Planlı Bakım'] : ['Arıza', 'Kalite Sorunu', 'Hammadde Bekleme'];
-            r.forEach(x => { $('<button>').addClass('dt-btn').css('background', t==='Planlı'?'#d97706':'#df2311').text(x).click(() => startDt(x)).appendTo(div); });
+            const r = t==='Planlı' ? ['Mola', 'Vardiya Değişimi', 'Planlı Bakım', 'Bayram Tatili'] : ['Arıza', 'Kalite Sorunu', 'Hammadde Bekleme'];
+            r.forEach(x => { $('<button>').addClass('dt-btn').css('background', t==='Planlı'?'#d97706':'#df2311').text(x).click(() => startDt(x, t)).appendTo(div); });
         }
         
-        function startDt(r) { 
-            running = false; dtStart = Date.now(); $('#ds3').removeClass('active'); $('#ds4').addClass('active'); 
-            $('#status-card').removeClass('status-ok').css({'border-left-color':'var(--danger)'}).find('h1').css('color','var(--danger)').text("DURUŞ AKTİF: " + selSt); 
-            $('#status-card p').text("Sebebi: " + r);
-            addLog(`${selSt} İSTASYONU DURDURULDU: ${r}`, 'red'); 
-            dtInt = setInterval(() => { 
-                let s = Math.floor((Date.now()-dtStart)/1000); 
-                $('#dt-timer').text(new Date(s*1000).toISOString().substr(11,8)); 
-            }, 1000); 
-        }
-        
-        function stopDt() { 
-            running = true; clearInterval(dtInt); $('#ds4').removeClass('active'); $('#ds1').addClass('active'); 
-            $('#status-card').addClass('status-ok').css({'border-left-color':'var(--success)'}).find('h1').css('color','var(--success)').text("ÜRETİM AKTİF"); 
-            $('#status-card p').text("Sistem senkronize çalışıyor."); addLog(`${selSt} TEKRAR DEVREYE ALINDI`, 'green'); 
-        }
-
         function calculateOEE() {
-            let oee = (pCount > 0 ? ((pCount - dCount) / pCount * 100).toFixed(1) : "94.5");
-            return oee;
+            let totalShiftTime = 480; 
+            let unplannedLoss = totalUnplannedDowntime / 10; 
+            let availability = (totalShiftTime - unplannedLoss) / totalShiftTime;
+            
+            if (availability > 1) availability = 1;
+            if (availability < 0.6) availability = 0.6;
+            
+            let quality = pCount > 0 ? ((pCount - dCount) / pCount) : 0.997;
+            let performance = 0.991;
+            
+            return (availability * performance * quality * 100).toFixed(1);
         }
 
         function updateOeeDisplay() {
@@ -716,6 +720,42 @@
                     $('#m-def').text(m.def);
                 }
             }
+        }
+
+        function startDt(r, t) { 
+            running = false; 
+            dtStart = Date.now(); 
+            dtType = t;
+            $('#ds3').removeClass('active'); $('#ds4').addClass('active'); 
+            
+            let color = t === 'Planlı' ? 'var(--warning)' : 'var(--danger)';
+            $('#status-card').removeClass('status-ok').css({'border-left-color': color}).find('h1').css('color', color).text("DURUŞ AKTİF: " + selSt); 
+            $('#status-card p').text("Sebebi: " + r);
+            addLog(`${selSt} İSTASYONU DURDURULDU: ${r}`, 'red'); 
+            
+            dtInt = setInterval(() => { 
+                let s = Math.floor((Date.now()-dtStart)/1000); 
+                $('#dt-timer').text(new Date(s*1000).toISOString().substr(11,8)); 
+                
+                if (dtType === "Plansız") {
+                    totalUnplannedDowntime += 1; 
+                } else {
+                    totalPlannedDowntime += 1; 
+                }
+                updateOeeDisplay();
+            }, 1000); 
+        }
+
+        function stopDt() { 
+            running = true; 
+            clearInterval(dtInt); 
+            dtStart = null;
+            dtType = "";
+            $('#ds4').removeClass('active'); $('#ds1').addClass('active'); 
+            $('#status-card').addClass('status-ok').css({'border-left-color':'var(--success)'}).find('h1').css('color':'var(--success)').text("ÜRETİM AKTİF"); 
+            $('#status-card p').text("Sistem senkronize çalışıyor."); 
+            addLog(`${selSt} TEKRAR DEVREYE ALINDI`, 'green'); 
+            updateOeeDisplay();
         }
 
         async function listCams() { 
@@ -881,8 +921,11 @@
             setInterval(() => { $('#live-clock').text(new Date().toLocaleTimeString()); }, 1000);
             
             const mFilter = $('#machine-filter');
+            const dtList = $('#dt-st-list');
+            
             machines.forEach(m => {
                 $('<option>').val(m.id).text(m.n).appendTo(mFilter);
+                $('<button>').addClass('dt-btn').css('background','#555').text(m.n).click(() => goDtStep2(m.n)).appendTo(dtList);
             });
 
             startCounterLoop(); 
