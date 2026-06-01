@@ -25,10 +25,13 @@
         .login-btn:hover { filter: brightness(0.9); }
 
         header { background-color: var(--card-bg); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--primary-gray); box-shadow: var(--shadow); position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; gap: 10px; }
-        .header-left { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
-        .logo { height: 50px; width: auto; object-fit: contain; margin-right: 5px; }
-        .clock-box { font-size: 1.4em; font-weight: 700; background: #f0f0f0; padding: 5px 15px; border-radius: 6px; border: 2px solid var(--border); font-family: monospace; }
-        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header-left { display: flex; align-items: center; gap: 30px; flex: 1; }
+        .header-center { display: flex; align-items: center; justify-content: center; gap: 15px; flex: 1.5; }
+        .header-right { display: flex; align-items: center; justify-content: flex-end; gap: 15px; flex: 1; }
+        
+        .logo { height: 50px; width: auto; object-fit: contain; }
+        .clock-box { font-size: 1.4em; font-weight: 900; background: #ffffff; padding: 6px 18px; border-radius: 8px; border: 3px solid var(--border); font-family: monospace; letter-spacing: 1px; margin: 0 auto; }
+        
         .operator-photo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
 
         .notif-bell { position: relative; cursor: pointer; font-size: 1.6em; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; border-radius: 50%; border: 2px solid var(--border); transition: 0.2s; user-select: none; }
@@ -65,6 +68,10 @@
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 8500; }
         .form-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #ddd; border-radius: 6px; font-weight: bold; font-size: 1em; }
 
+        .st-card { padding: 15px; background: #f8f8f8; border: 2px solid var(--primary-gray); border-radius: 10px; cursor: pointer; text-align: center; transition: 0.3s; }
+        .st-card:hover { border-color: var(--danger); transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .st-card h4 { margin-bottom: 5px; font-size: 1.1em; font-weight: 900; }
+
         .dt-step { display: none; }
         .dt-step.active { display: block; }
         .dt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
@@ -79,13 +86,12 @@
 
         @media screen and (max-width: 768px) {
             header { flex-direction: column; align-items: flex-start; padding: 10px; }
-            .header-right { width: 100%; justify-content: space-between; margin-top: 10px; }
+            .header-left, .header-center, .header-right { width: 100%; justify-content: space-between; margin-top: 10px; }
             .header-slogan { display: none; }
             .dashboard-grid { grid-template-columns: 1fr !important; }
             .chart-wrapper { height: 300px; }
             .modal-box { padding: 15px; width: 90vw; }
             .modal-box .card h2 { font-size: 2em !important; }
-            .dt-grid { grid-template-columns: 1fr; }
         }
 
         @media screen and (orientation: landscape) and (max-height: 500px) {
@@ -124,15 +130,16 @@
     <div id="main-dashboard" style="display:none;">
         <header>
             <div class="header-left">
-                <img src="download.png" class="logo" title="SUBÜ" alt="SUBU">
+                <img src="download.png" class="logo" title="SUBÜ" alt="SUBU" style="height: 55px;">
                 <div class="clock-box" id="live-clock">00:00:00</div>
-                <img src="FOTM.jpg" class="logo" title="FOT-M" alt="FOT-M">
-                
-                <div style="display: flex; align-items: center; gap: 8px;" class="header-slogan">
-                    <img src="uretimingelecegilogobeyaz.png" class="logo" style="height: 45px;" alt="Slogan">
-                    <span style="font-weight: 900; font-size: 0.8em; line-height: 1.2;">ÜRETİMİN GELECEĞİ<br><small style="color:#555;">BİZİM ELİMİZDE</small></span>
-                </div>
             </div>
+            
+            <div class="header-center">
+                <img src="FOTM.jpg" class="logo" title="FOT-M" alt="FOT-M" style="height: 60px; border-radius: 50%;">
+                <img src="uretimingelecegilogobeyaz.png" class="logo" style="height: 50px;" alt="Slogan Logo">
+                <span style="font-weight: 900; font-size: 0.85em; line-height: 1.2; text-align: left;">ÜRETİMİN GELECEĞİ<br><small style="color:#555;">BİZİM ELİMİZDE</small></span>
+            </div>
+
             <div class="header-right">
                 <div style="text-align: right; margin-left: 10px;">
                     <p id="op-name" style="font-weight:900; font-size: 1.1em;"></p>
@@ -219,28 +226,28 @@
             </div>
 
             <div id="t3" class="tab-content" style="display:none;">
-                <div class="card" style="max-width: 1000px; margin: 0 auto;">
+                <div class="card" style="max-width: 1000px; margin: 0 auto; padding: 30px;">
                     <div id="ds1" class="dt-step active">
-                        <h3>1. ADIM: İSTASYON SEÇİN</h3>
+                        <h3 style="margin-bottom: 20px; font-size: 1.2em; border-bottom: 2px solid #eee; padding-bottom: 10px;">1. ADIM: İSTASYON SEÇİN</h3>
                         <div class="dt-grid" id="dt-st-list"></div>
                     </div>
                     <div id="ds2" class="dt-step">
-                        <h3>2. ADIM: DURUŞ TİPİ SEÇİN (<span id="dt-sel-st"></span>)</h3>
+                        <h3 style="margin-bottom: 20px; font-size: 1.2em; border-bottom: 2px solid #eee; padding-bottom: 10px;">2. ADIM: DURUŞ TİPİ SEÇİN (<span id="dt-sel-st"></span>)</h3>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                             <button class="dt-btn" style="background:var(--warning);" onclick="goDt3('Planlı')">PLANLI DURUŞ</button>
                             <button class="dt-btn" style="background:var(--danger);" onclick="goDt3('Plansız')">PLANSIZ DURUŞ</button>
                         </div>
-                        <button class="login-btn" style="margin-top:20px; background:var(--primary-gray);" onclick="$('#ds2').removeClass('active'); $('#ds1').addClass('active');">⬅ İPTAL / GERİ</button>
+                        <button class="login-btn" style="margin-top:30px; background:var(--primary-gray);" onclick="$('#ds2').removeClass('active'); $('#ds1').addClass('active');">GERİ</button>
                     </div>
                     <div id="ds3" class="dt-step">
-                        <h3>3. ADIM: DURUŞ SEBEBİ</h3>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;" id="dt-reasons"></div>
-                        <button class="login-btn" style="margin-top:20px; background:var(--primary-gray);" onclick="$('#ds3').removeClass('active'); $('#ds2').addClass('active');">⬅ GERİ</button>
+                        <h3 style="margin-bottom: 20px; font-size: 1.2em; border-bottom: 2px solid #eee; padding-bottom: 10px;">3. ADIM: DURUŞ SEBEBİ</h3>
+                        <div id="dt-reasons" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"></div>
+                        <button class="login-btn" style="margin-top:30px; background:var(--primary-gray);" onclick="$('#ds3').removeClass('active'); $('#ds2').addClass('active');">GERİ</button>
                     </div>
                     <div id="ds4" class="dt-step">
-                        <h2 style="color:var(--danger); text-align:center;">MAKİNE DURDURULDU</h2>
-                        <h1 id="dt-timer" style="font-size:5em; text-align:center; font-family:monospace; margin:20px 0;">00:00:00</h1>
-                        <button class="login-btn" style="background:var(--success); width:100%; font-size:1.5em; padding:25px;" onclick="stopDt()">▶ ÜRETİME GERİ DÖN</button>
+                        <h2 style="color:var(--danger); text-align:center; font-size: 2em; margin-bottom: 10px;">MAKİNE DURDURULDU</h2>
+                        <h1 id="dt-timer" style="font-size:6em; text-align:center; font-family:monospace; margin:20px 0;">00:00:00</h1>
+                        <button class="login-btn" style="background:var(--success); width:100%; font-size:1.5em; padding:25px; border-radius: 12px;" onclick="stopDt()">ÜRETİME GERİ DÖN</button>
                     </div>
                 </div>
             </div>
@@ -415,7 +422,7 @@
     </div>
 
     <script>
-        let updateSpeed = 4000; 
+        let updateSpeed = 6000; 
         let running = true, pCount = 1420, dCount = 11, dtStart = null, dtInt = null, ws = null, selSt = "", eChart, pChart, notifCount = 0;
         let simInterval = null;
         
@@ -507,6 +514,7 @@
             } catch (e) {
                 console.log("Render bağlantı hatası:", e);
 
+                // Sunucu kapalıysa bile sistem açılsın
                 $('#login-modal').fadeOut();
                 $('#main-dashboard').fadeIn();
 
@@ -632,7 +640,7 @@
         
         function stopDt() { 
             running = true; clearInterval(dtInt); $('#ds4').removeClass('active'); $('#ds1').addClass('active'); 
-            $('#status-card').addClass('status-ok').css({'border-left-color':'var(--success)'}).find('h1').css('color':'var(--success)').text("ÜRETİM AKTİF"); 
+            $('#status-card').addClass('status-ok').css({'border-left-color':'var(--success)'}).find('h1').css('color','var(--success)').text("ÜRETİM AKTİF"); 
             $('#status-card p').text("Sistem senkronize çalışıyor."); addLog(`${selSt} TEKRAR DEVREYE ALINDI`, 'green'); 
             updateOeeDisplay();
         }
@@ -655,26 +663,20 @@
             let oee = calculateOEE();
             $('#kpi-o').text('%' + oee);
             
-            // Mühendislik Harikası: DOM'u sıfırdan silip yapmak yerine sadece verileri güncelleyerek tıklama sorununu çözüyoruz
+            const mBody = $('#m-table-body').empty();
+            const mList = $('#machine-list').empty();
+            
             machines.forEach((m, idx) => {
                 let stationVariance = (idx % 2 === 0 ? 0.3 : -0.4) + Math.sin(Date.now() / 30000 + idx) * 0.05;
                 let calculatedStationOee = (parseFloat(oee) + stationVariance);
                 if (calculatedStationOee > 100) calculatedStationOee = 100;
                 m.o = calculatedStationOee.toFixed(1);
                 
-                let targetRow = $(`#row-${m.id}`);
-                if(targetRow.length > 0) {
-                    targetRow.find('.st-status-td').text(running ? 'Aktif' : 'Duruşta');
-                    targetRow.find('.st-oee-td').text('%' + m.o);
-                    targetRow.find('.st-power-td').text(m.p);
-                }
+                mBody.append(`<tr><td>${m.n}</td><td>${running ? 'Aktif' : 'Duruşta'}</td><td>%${m.o}</td><td>${m.p}</td></tr>`);
                 
-                let targetCard = $(`#card-${m.id}`);
-                if(targetCard.length > 0) {
-                    targetCard.find('.st-card-oee-text').text(`OEE: %${m.o}`);
-                    targetCard.find('.st-card-power-text').text(`Güç: ${m.p} kW/h`);
-                    targetCard.find('.st-online-span').text(running ? '● Çevrimiçi' : '■ Duruşta').css('color', running ? 'var(--success)' : 'var(--danger)');
-                }
+                $('<div class="st-card">')
+                    .html(`<h4 style="color:var(--border);">${m.n}</h4><span style="color:var(--success); font-size:0.8em; font-weight:900;">● Çevrimiçi</span><br><br><small style="font-weight:700;">OEE: %${m.o}</small><br><small style="font-weight:700;">Güç: ${m.p} kW/h</small>`)
+                    .click(() => openM(m.id)).appendTo(mList);
             });
             
             if ($('#m-modal').is(':visible') && selSt) {
@@ -743,6 +745,72 @@
                 }
             });
         }
+
+        function saveWorkOrder() {
+            const code = $('#m-wo-code').val().trim().toUpperCase() || '-';
+            const name = $('#m-wo-name').val().trim().toUpperCase();
+            const client = '-';
+            const op = $('#m-wo-op').val().trim() || 'Muhammed Arda Sarı';
+            const target = parseInt($('#m-wo-target').val()) || 0;
+            const priority = $('#m-wo-priority').val();
+            const status = $('#m-wo-status').val();
+            const cycle = $('#m-wo-cycle').val() || '1.5';
+            
+            if(!name || !target) { alert("Lütfen ürün adı ve hedef miktar girin!"); return; }
+
+            if(status === 'AKTİF ÜRETİM') {
+                workOrders.forEach(wo => {
+                    if(wo.status === 'AKTİF ÜRETİM') wo.status = 'BEKLEYEN';
+                });
+            }
+
+            if(editingWoId !== null) {
+                let wo = workOrders.find(x => x.id === editingWoId);
+                if(wo) {
+                    wo.code = code; wo.name = name; wo.client = client; wo.op = op;
+                    wo.target = target; wo.priority = priority; wo.status = status; wo.cycle = cycle;
+                    addLog("İş Emri Güncellendi: #" + wo.id, "blue");
+                }
+            } else {
+                const randId = Math.floor(Math.random() * 9000) + 1000; 
+                const time = new Date().toLocaleTimeString().substr(0,5);
+                const newWo = {
+                    id: randId, code: code, name: name, client: client, priority: priority,
+                    status: status, time: time, endTime: '-', target: target, produced: 0, defect: 0, op: op, cycle: cycle
+                };
+                if(priority === 'ACİL') { workOrders.unshift(newWo); } else { workOrders.push(newWo); }
+                addLog("Yeni İş Emri Eklendi: #" + randId + " - " + name, "green");
+            }
+            
+            closeWoModal();
+            renderWorkOrders();
+        }
+
+        function clearNotifs() {
+            notifCount = 0; $('#notif-count').text("0"); $('#notif-list').empty(); $('#notif-panel').fadeOut();
+        }
+
+        function openM(id) { 
+            const m = machines.find(x => x.id === id); 
+            $('#modal-name').text(m.n + " İstasyon Verileri"); 
+            $('#m-oee').text('%' + m.o); $('#m-p').html(`${m.p} <small style="font-size:0.4em; color:#333;">kW/h</small>`); $('#m-t').html(`${m.t} <small style="font-size:0.4em; color:#333;">°C</small>`);
+            $('#m-prod').text(m.prod); $('#m-def').text(m.def); $('#m-uptime').text(m.uptime);
+            $('#m-overlay, #m-modal').fadeIn(); 
+        }
+        function closeM() { $('#m-overlay, #m-modal').fadeOut(); }
+
+        function openWoModal() {
+            editingWoId = null;
+            $('#wo-modal-title').text('YENİ İŞ EMRİ OLUŞTUR');
+            $('.form-input').val(''); 
+            $('#m-wo-client').val('-'); 
+            $('#m-wo-op').val('Muhammed Arda Sarı');
+            $('#m-wo-priority').val('NORMAL');
+            $('#m-wo-status').val('BEKLEYEN');
+            $('#m-wo-cycle').val('1.5');
+            $('#wo-overlay, #wo-modal').fadeIn();
+        }
+        function closeWoModal() { $('#wo-overlay, #wo-modal').fadeOut(); }
 
         async function listCams() { 
             try {
@@ -879,6 +947,7 @@
             simInterval = setInterval(() => { 
                 if(!running) return; 
                 
+                // Fabrika standardında parça artış hızı
                 pCount += 1; 
                 
                 let activeWO = workOrders.find(wo => wo.status === 'AKTİF ÜRETİM');
@@ -904,34 +973,6 @@
         }
 
         function init() {
-            // Başlangıçta DOM elemanlarını bir kereye mahsus oluşturup bağlıyoruz (Performans ve Tıklama Sorunları Çözüldü)
-            const mBody = $('#m-table-body').empty();
-            const mList = $('#machine-list').empty();
-            
-            machines.forEach((m) => {
-                mBody.append(`
-                    <tr id="row-${m.id}">
-                        <td>${m.n}</td>
-                        <td class="st-status-td">Aktif</td>
-                        <td class="st-oee-td">%${m.o}</td>
-                        <td class="st-power-td">${m.p}</td>
-                    </tr>
-                `);
-                
-                $('<div class="st-card">')
-                    .attr('id', `card-${m.id}`)
-                    .html(`
-                        <h4 style="color:var(--border);">${m.n}</h4>
-                        <span class="st-online-span" style="color:var(--success); font-size:0.8em; font-weight:900;">● Çevrimiçi</span>
-                        <br><br>
-                        <small class="st-card-oee-text" style="font-weight:700;">OEE: %${m.o}</small>
-                        <br>
-                        <small class="st-card-power-text" style="font-weight:700;">Güç: ${m.p} kW/h</small>
-                    `)
-                    .click(() => openM(m.id))
-                    .appendTo(mList);
-            });
-
             startCounterLoop(); 
 
             eChart = new Chart(document.getElementById('chart-energy'), {
@@ -950,6 +991,7 @@
             updateOeeDisplay();
             renderWorkOrders();
 
+            // İstasyon analizi verilerinin dakikada bir kararlı değişimi
             setInterval(() => {
                 if(!running) return;
                 machines.forEach(m => {
@@ -970,6 +1012,7 @@
             listCams(); 
         }
 
+        // Global scope'a almak için en sona eklenmesi gerekenler:
         window.tab = tab;
         window.editWO = editWO;
         window.completeWO = completeWO;
@@ -993,6 +1036,8 @@
         window.login = login;
 
         $(document).ready(function() {
+            setInterval(() => { $('#live-clock').text(new Date().toLocaleTimeString()); }, 1000);
+            
             const mFilter = $('#machine-filter');
             const dtList = $('#dt-st-list');
             
