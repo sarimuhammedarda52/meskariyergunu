@@ -491,7 +491,13 @@
             }
         }
 
-        function goDtStep2(n) { selSt = n; $('#dt-sel-st').text(n); $('#ds1').removeClass('active'); $('#ds2').addClass('active'); }
+        function goDtStep2(n) { 
+            selSt = n; 
+            $('#dt-sel-st').text(n); 
+            $('#ds1').removeClass('active'); 
+            $('#ds2').addClass('active'); 
+        }
+        
         function goDt3(t) {
             $('#ds2').removeClass('active'); $('#ds3').addClass('active'); 
             const div = $('#dt-reasons').empty();
