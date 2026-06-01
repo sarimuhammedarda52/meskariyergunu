@@ -186,7 +186,7 @@
                     </h3>
                     <div class="table-container">
                         <table>
-                            <thead><tr><th>No</th><th>Ürün (Kod)</th><th>Müşteri</th><th>Öncelik</th><th>Durum</th><th>Hedef</th><th>Üretilen</th><th>Kalite %</th><th>İşlemler</th></tr></thead>
+                            <thead><tr><th>No</th><th>Ürün (Kod)</th><th>Müşteri</th><th>Öncelik</th><th>Durum</th><th>Başlangıç</th><th>Hedef</th><th>Üretilen</th><th>Kalite %</th><th>İşlemler</th></tr></thead>
                             <tbody id="wo-tbody"></tbody>
                         </table>
                     </div>
@@ -382,6 +382,38 @@
         <button class="login-btn" style="background:var(--border);" onclick="$('#wo-overlay, #wo-details-modal').fadeOut();">KAPAT</button>
     </div>
 
+    <div class="overlay" id="m-overlay" onclick="closeM()"></div>
+    <div class="modal-box" id="m-modal" style="max-width: 800px;">
+        <h2 id="modal-name" style="margin-bottom: 20px; border-bottom: 2px solid #ccc; padding-bottom:10px; font-weight:900; text-transform:uppercase;">İstasyon Analizi</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+            <div class="card" style="border-left-color:var(--success); margin:0; padding:15px;">
+                <h3 style="font-size:0.85em;">ANLIK OEE</h3>
+                <h2 id="m-oee" style="color:var(--success); font-size:2em;">%0</h2>
+            </div>
+            <div class="card" style="border-left-color:var(--warning); margin:0; padding:15px;">
+                <h3 style="font-size:0.85em;">ENERJİ TÜKETİMİ</h3>
+                <h2 id="m-p" style="color:var(--warning); font-size:2em;">0 <small style="font-size:0.4em; color:#333;">kW/h</small></h2>
+            </div>
+            <div class="card" style="border-left-color:#3b82f6; margin:0; padding:15px;">
+                <h3 style="font-size:0.85em;">SICAKLIK</h3>
+                <h2 id="m-t" style="color:#3b82f6; font-size:2em;">0 <small style="font-size:0.4em; color:#333;">°C</small></h2>
+            </div>
+            <div class="card" style="border-left-color:#8b5cf6; margin:0; padding:15px;">
+                <h3 style="font-size:0.85em;">ÜRETİLEN</h3>
+                <h2 id="m-prod" style="color:#8b5cf6; font-size:2em;">0</h2>
+            </div>
+            <div class="card" style="border-left-color:var(--danger); margin:0; padding:15px;">
+                <h3 style="font-size:0.85em;">FİRE</h3>
+                <h2 id="m-def" style="color:var(--danger); font-size:2em;">0</h2>
+            </div>
+            <div class="card" style="border-left-color:#10b981; margin:0; padding:15px;">
+                <h3 style="font-size:0.85em;">ÇALIŞMA SÜRESİ</h3>
+                <h2 id="m-uptime" style="color:#10b981; font-size:1.5em; line-height:1.3;">0s 0d</h2>
+            </div>
+        </div>
+        <button class="login-btn" style="width:100%; margin-top:25px; background:var(--border);" onclick="closeM()">⬅ GERİ DÖN</button>
+    </div>
+
     <script>
         let updateSpeed = 4000; 
         let running = true, pCount = 1420, dCount = 11, dtStart = null, dtInt = null, ws = null, selSt = "", eChart, pChart, notifCount = 0;
@@ -505,19 +537,158 @@
             `);
         }
 
-        function openWoModal() {
-            editingWoId = null;
-            $('#wo-modal-title').text('YENİ İŞ EMRİ OLUŞTUR');
-            $('.form-input').val(''); 
-            $('#m-wo-client').val('-'); 
-            $('#m-wo-op').val('Muhammed Arda Sarı');
-            $('#m-wo-priority').val('NORMAL');
-            $('#m-wo-status').val('BEKLEYEN');
-            $('#m-wo-cycle').val('1.5');
+        function tab(e, id) { 
+            $('.tab-content').hide(); $('.tab-btn').removeClass('active'); 
+            $('#'+id).show(); if(e) $(e.currentTarget).addClass('active'); 
+            if(id === 't4') { updateEnergyChart(); }
+        }
+
+        function editWO(id) {
+            let wo = workOrders.find(x => x.id === id);
+            if(!wo) return;
+            editingWoId = id;
+            $('#wo-modal-title').text(`İŞ EMRİ DÜZENLE: #${id}`);
+            $('#m-wo-code').val(wo.code);
+            $('#m-wo-name').val(wo.name);
+            $('#m-wo-client').val('-');
+            $('#m-wo-op').val(wo.op);
+            $('#m-wo-target').val(wo.target);
+            $('#m-wo-priority').val(wo.priority);
+            $('#m-wo-status').val(wo.status);
+            $('#m-wo-cycle').val(wo.cycle);
             $('#wo-overlay, #wo-modal').fadeIn();
         }
-        function closeWoModal() { $('#wo-overlay, #wo-modal').fadeOut(); }
+
+        function completeWO(id) {
+            let wo = workOrders.find(x => x.id === id);
+            if(wo) {
+                wo.status = 'TAMAMLANDI';
+                wo.endTime = new Date().toLocaleTimeString().substr(0,5);
+                addLog("İş Emri Tamamlandı: #" + id, "green");
+                renderWorkOrders();
+            }
+        }
+
+        function viewWoDetails(id) {
+            let wo = workOrders.find(x => x.id === id);
+            if(!wo) return;
+            $('#det-wo-id').text(`#${wo.id}`);
+            $('#det-wo-status').text(wo.status);
+            $('#det-wo-name').text(wo.name);
+            $('#det-wo-code').text(wo.code);
+            $('#det-wo-client').text('-');
+            $('#det-wo-priority').text(wo.priority);
+            $('#det-wo-times').text(`${wo.time} / ${wo.endTime}`);
+            $('#det-wo-op').text(wo.op);
+            $('#det-wo-target').text(wo.target);
+            $('#det-wo-prod').text(wo.produced);
+            $('#det-wo-def').text(wo.defect);
+            $('#det-wo-cycle').text(wo.cycle);
+            $('#wo-overlay, #wo-details-modal').fadeIn();
+        }
+
+        function deleteWO(id) {
+            if(confirm("Bu iş emrini listeden silmek istediğinize emin misiniz?")) {
+                workOrders = workOrders.filter(x => x.id !== id);
+                addLog("İş Emri #" + id + " silindi.", "orange");
+                renderWorkOrders();
+            }
+        }
+
+        function goDtStep2(n) { selSt = n; $('#dt-sel-st').text(n); $('#ds1').removeClass('active'); $('#ds2').addClass('active'); }
         
+        function goDt3(t) {
+            $('#ds2').removeClass('active'); $('#ds3').addClass('active'); 
+            dtType = t;
+            const div = $('#dt-reasons').empty();
+            const r = t==='Planlı' ? ['Mola', 'Vardiya Değişimi', 'Planlı Bakım', 'Bayram Tatili'] : ['Arıza', 'Kalite Sorunu', 'Hammadde Bekleme'];
+            r.forEach(x => { 
+                $('<button>')
+                    .addClass('dt-btn')
+                    .css('background', t==='Planlı' ? '#d97706' : '#df2311')
+                    .text(x)
+                    .click(() => startDt(x))
+                    .appendTo(div); 
+            });
+        }
+        
+        function startDt(r) { 
+            running = false; dtStart = Date.now(); $('#ds3').removeClass('active'); $('#ds4').addClass('active'); 
+            let color = dtType === 'Planlı' ? 'var(--warning)' : 'var(--danger)';
+            $('#status-card').removeClass('status-ok').css({'border-left-color': color}).find('h1').css('color', color).text("DURUŞ AKTİF: " + selSt); 
+            $('#status-card p').text("Sebebi: " + r);
+            addLog(`${selSt} İSTASYONU DURDURULDU: ${r}`, 'red'); 
+            dtInt = setInterval(() => { 
+                let s = Math.floor((Date.now()-dtStart)/1000); 
+                $('#dt-timer').text(new Date(s*1000).toISOString().substr(11,8)); 
+                if (dtType === "Plansız") {
+                    liveUnplannedSeconds += 1; 
+                } else {
+                    livePlannedSeconds += 1; 
+                }
+                updateOeeDisplay();
+            }, 1000); 
+        }
+        
+        function stopDt() { 
+            running = true; clearInterval(dtInt); $('#ds4').removeClass('active'); $('#ds1').addClass('active'); 
+            $('#status-card').addClass('status-ok').css({'border-left-color':'var(--success)'}).find('h1').css('color':'var(--success)').text("ÜRETİM AKTİF"); 
+            $('#status-card p').text("Sistem senkronize çalışıyor."); addLog(`${selSt} TEKRAR DEVREYE ALINDI`, 'green'); 
+            updateOeeDisplay();
+        }
+
+        function calculateOEE() {
+            let totalShiftTime = 28800; 
+            let unplannedLoss = historicalUnplannedSeconds + liveUnplannedSeconds; 
+            let availability = (totalShiftTime - unplannedLoss) / totalShiftTime;
+            
+            if (availability > 1) availability = 1;
+            if (availability < 0.6) availability = 0.6;
+            
+            let quality = pCount > 0 ? ((pCount - dCount) / pCount) : 0.995;
+            let performance = 0.992;
+            
+            return (availability * performance * quality * 100).toFixed(1);
+        }
+
+        function updateOeeDisplay() {
+            let oee = calculateOEE();
+            $('#kpi-o').text('%' + oee);
+            
+            // Mühendislik Harikası: DOM'u sıfırdan silip yapmak yerine sadece verileri güncelleyerek tıklama sorununu çözüyoruz
+            machines.forEach((m, idx) => {
+                let stationVariance = (idx % 2 === 0 ? 0.3 : -0.4) + Math.sin(Date.now() / 30000 + idx) * 0.05;
+                let calculatedStationOee = (parseFloat(oee) + stationVariance);
+                if (calculatedStationOee > 100) calculatedStationOee = 100;
+                m.o = calculatedStationOee.toFixed(1);
+                
+                let targetRow = $(`#row-${m.id}`);
+                if(targetRow.length > 0) {
+                    targetRow.find('.st-status-td').text(running ? 'Aktif' : 'Duruşta');
+                    targetRow.find('.st-oee-td').text('%' + m.o);
+                    targetRow.find('.st-power-td').text(m.p);
+                }
+                
+                let targetCard = $(`#card-${m.id}`);
+                if(targetCard.length > 0) {
+                    targetCard.find('.st-card-oee-text').text(`OEE: %${m.o}`);
+                    targetCard.find('.st-card-power-text').text(`Güç: ${m.p} kW/h`);
+                    targetCard.find('.st-online-span').text(running ? '● Çevrimiçi' : '■ Duruşta').css('color', running ? 'var(--success)' : 'var(--danger)');
+                }
+            });
+            
+            if ($('#m-modal').is(':visible') && selSt) {
+                const m = machines.find(x => x.n === selSt || selSt.includes(x.n));
+                if (m) {
+                    $('#m-oee').text('%' + m.o);
+                    $('#m-p').html(`${m.p} <small style="font-size:0.4em; color:#333;">kW/h</small>`);
+                    $('#m-t').html(`${m.t} <small style="font-size:0.4em; color:#333;">°C</small>`);
+                    $('#m-prod').text(m.prod);
+                    $('#m-def').text(m.def);
+                }
+            }
+        }
+
         function renderWorkOrders() {
             const activeBody = $('#wo-tbody').empty();
             const completedBody = $('#wo-completed-tbody').empty();
@@ -571,127 +742,6 @@
                     activeBody.append(row);
                 }
             });
-        }
-
-        function saveWorkOrder() {
-            const code = $('#m-wo-code').val().trim().toUpperCase() || '-';
-            const name = $('#m-wo-name').val().trim().toUpperCase();
-            const client = '-';
-            const op = $('#m-wo-op').val().trim() || 'Muhammed Arda Sarı';
-            const target = parseInt($('#m-wo-target').val()) || 0;
-            const priority = $('#m-wo-priority').val();
-            const status = $('#m-wo-status').val();
-            const cycle = $('#m-wo-cycle').val() || '1.5';
-            
-            if(!name || !target) { alert("Lütfen ürün adı ve hedef miktar girin!"); return; }
-
-            if(status === 'AKTİF ÜRETİM') {
-                workOrders.forEach(wo => {
-                    if(wo.status === 'AKTİF ÜRETİM') wo.status = 'BEKLEYEN';
-                });
-            }
-
-            if(editingWoId !== null) {
-                let wo = workOrders.find(x => x.id === editingWoId);
-                if(wo) {
-                    wo.code = code; wo.name = name; wo.client = client; wo.op = op;
-                    wo.target = target; wo.priority = priority; wo.status = status; wo.cycle = cycle;
-                    addLog("İş Emri Güncellendi: #" + wo.id, "blue");
-                }
-            } else {
-                const randId = Math.floor(Math.random() * 9000) + 1000; 
-                const time = new Date().toLocaleTimeString().substr(0,5);
-                const newWo = {
-                    id: randId, code: code, name: name, client: client, priority: priority,
-                    status: status, time: time, endTime: '-', target: target, produced: 0, defect: 0, op: op, cycle: cycle
-                };
-                if(priority === 'ACİL') { workOrders.unshift(newWo); } else { workOrders.push(newWo); }
-                addLog("Yeni İş Emri Eklendi: #" + randId + " - " + name, "green");
-            }
-            
-            closeWoModal();
-            renderWorkOrders();
-        }
-
-        function goDtStep2(n) { selSt = n; $('#dt-sel-st').text(n); $('#ds1').removeClass('active'); $('#ds2').addClass('active'); }
-        
-        function goDt3(t) {
-            $('#ds2').removeClass('active'); $('#ds3').addClass('active'); 
-            dtType = t;
-            const div = $('#dt-reasons').empty();
-            const r = t==='Planlı' ? ['Mola', 'Vardiya Değişimi', 'Planlı Bakım', 'Bayram Tatili'] : ['Arıza', 'Kalite Sorunu', 'Hammadde Bekleme'];
-            r.forEach(x => { $('<button>').addClass('dt-btn').css('background', t==='Planlı'?'#d97706':'#df2311').text(x).click(() => startDt(x)).appendTo(div); });
-        }
-        
-        function startDt(r) { 
-            running = false; dtStart = Date.now(); $('#ds3').removeClass('active'); $('#ds4').addClass('active'); 
-            let color = dtType === 'Planlı' ? 'var(--warning)' : 'var(--danger)';
-            $('#status-card').removeClass('status-ok').css({'border-left-color': color}).find('h1').css('color', color).text("DURUŞ AKTİF: " + selSt); 
-            $('#status-card p').text("Sebebi: " + r);
-            addLog(`${selSt} İSTASYONU DURDURULDU: ${r}`, 'red'); 
-            dtInt = setInterval(() => { 
-                let s = Math.floor((Date.now()-dtStart)/1000); 
-                $('#dt-timer').text(new Date(s*1000).toISOString().substr(11,8)); 
-                if (dtType === "Plansız") {
-                    liveUnplannedSeconds += 1; 
-                } else {
-                    livePlannedSeconds += 1; 
-                }
-                updateOeeDisplay();
-            }, 1000); 
-        }
-        
-        function stopDt() { 
-            running = true; clearInterval(dtInt); $('#ds4').removeClass('active'); $('#ds1').addClass('active'); 
-            $('#status-card').addClass('status-ok').css({'border-left-color':'var(--success)'}).find('h1').css('color','var(--success)').text("ÜRETİM AKTİF"); 
-            $('#status-card p').text("Sistem senkronize çalışıyor."); addLog(`${selSt} TEKRAR DEVREYE ALINDI`, 'green'); 
-            updateOeeDisplay();
-        }
-
-        function calculateOEE() {
-            let totalShiftTime = 28800; 
-            let unplannedLoss = historicalUnplannedSeconds + liveUnplannedSeconds; 
-            let availability = (totalShiftTime - unplannedLoss) / totalShiftTime;
-            
-            if (availability > 1) availability = 1;
-            if (availability < 0.6) availability = 0.6;
-            
-            let quality = pCount > 0 ? ((pCount - dCount) / pCount) : 0.997;
-            let performance = 0.991;
-            
-            return (availability * performance * quality * 100).toFixed(1);
-        }
-
-        function updateOeeDisplay() {
-            let oee = calculateOEE();
-            $('#kpi-o').text('%' + oee);
-            
-            const mBody = $('#m-table-body').empty();
-            const mList = $('#machine-list').empty();
-            
-            machines.forEach((m, idx) => {
-                let stationVariance = (idx % 2 === 0 ? 0.3 : -0.4) + Math.sin(Date.now() / 30000 + idx) * 0.05;
-                let calculatedStationOee = (parseFloat(oee) + stationVariance);
-                if (calculatedStationOee > 100) calculatedStationOee = 100;
-                m.o = calculatedStationOee.toFixed(1);
-                
-                mBody.append(`<tr><td>${m.n}</td><td>${running ? 'Aktif' : 'Duruşta'}</td><td>%${m.o}</td><td>${m.p}</td></tr>`);
-                
-                $('<div class="st-card">')
-                    .html(`<h4 style="color:var(--border);">${m.n}</h4><span style="color:var(--success); font-size:0.8em; font-weight:900;">● Çevrimiçi</span><br><br><small style="font-weight:700;">OEE: %${m.o}</small><br><small style="font-weight:700;">Güç: ${m.p} kW/h</small>`)
-                    .click(() => openM(m.id)).appendTo(mList);
-            });
-            
-            if ($('#m-modal').is(':visible') && selSt) {
-                const m = machines.find(x => x.n === selSt || selSt.includes(x.n));
-                if (m) {
-                    $('#m-oee').text('%' + m.o);
-                    $('#m-p').html(`${m.p} <small style="font-size:0.4em; color:#333;">kW/h</small>`);
-                    $('#m-t').html(`${m.t} <small style="font-size:0.4em; color:#333;">°C</small>`);
-                    $('#m-prod').text(m.prod);
-                    $('#m-def').text(m.def);
-                }
-            }
         }
 
         async function listCams() { 
@@ -854,6 +904,34 @@
         }
 
         function init() {
+            // Başlangıçta DOM elemanlarını bir kereye mahsus oluşturup bağlıyoruz (Performans ve Tıklama Sorunları Çözüldü)
+            const mBody = $('#m-table-body').empty();
+            const mList = $('#machine-list').empty();
+            
+            machines.forEach((m) => {
+                mBody.append(`
+                    <tr id="row-${m.id}">
+                        <td>${m.n}</td>
+                        <td class="st-status-td">Aktif</td>
+                        <td class="st-oee-td">%${m.o}</td>
+                        <td class="st-power-td">${m.p}</td>
+                    </tr>
+                `);
+                
+                $('<div class="st-card">')
+                    .attr('id', `card-${m.id}`)
+                    .html(`
+                        <h4 style="color:var(--border);">${m.n}</h4>
+                        <span class="st-online-span" style="color:var(--success); font-size:0.8em; font-weight:900;">● Çevrimiçi</span>
+                        <br><br>
+                        <small class="st-card-oee-text" style="font-weight:700;">OEE: %${m.o}</small>
+                        <br>
+                        <small class="st-card-power-text" style="font-weight:700;">Güç: ${m.p} kW/h</small>
+                    `)
+                    .click(() => openM(m.id))
+                    .appendTo(mList);
+            });
+
             startCounterLoop(); 
 
             eChart = new Chart(document.getElementById('chart-energy'), {
@@ -915,8 +993,6 @@
         window.login = login;
 
         $(document).ready(function() {
-            setInterval(() => { $('#live-clock').text(new Date().toLocaleTimeString()); }, 1000);
-            
             const mFilter = $('#machine-filter');
             const dtList = $('#dt-st-list');
             
