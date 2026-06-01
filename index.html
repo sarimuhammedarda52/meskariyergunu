@@ -323,7 +323,7 @@
         <div style="display:flex; gap:10px;">
             <div style="flex:1;">
                 <label style="font-weight:bold; display:block; margin-bottom:5px;">Müşteri:</label>
-                <input type="text" id="m-wo-client" class="form-input" value="-">
+                <input type="text" id="m-wo-client" class="form-input" value="-" readonly>
             </div>
             <div style="flex:1;">
                 <label style="font-weight:bold; display:block; margin-bottom:5px;">Operatör:</label>
@@ -370,7 +370,7 @@
             <div class="card" style="margin:0; padding:12px; border-left-color:var(--success);">Durum: <span id="det-wo-status" style="color:var(--success);"></span></div>
             <div class="card" style="margin:0; padding:12px; border-left-color:#3b82f6;">Ürün Adı: <span id="det-wo-name"></span></div>
             <div class="card" style="margin:0; padding:12px; border-left-color:#3b82f6;">Ürün Kodu: <span id="det-wo-code"></span></div>
-            <div class="card" style="margin:0; padding:12px; border-left-color:#8b5cf6;">Müşteri: <span id="det-wo-client"></span></div>
+            <div class="card" style="margin:0; padding:12px; border-left-color:#8b5cf6;">Müşteri: <span id="det-wo-client">-</span></div>
             <div class="card" style="margin:0; padding:12px; border-left-color:var(--warning);">Öncelik: <span id="det-wo-priority"></span></div>
             <div class="card" style="margin:0; padding:12px; border-left-color:#555;">Zaman Çizelgesi: <span id="det-wo-times"></span></div>
             <div class="card" style="margin:0; padding:12px; border-left-color:#10b981;">Sorumlu Operatör: <span id="det-wo-op"></span></div>
@@ -382,48 +382,13 @@
         <button class="login-btn" style="background:var(--border);" onclick="$('#wo-overlay, #wo-details-modal').fadeOut();">KAPAT</button>
     </div>
 
-    <div class="overlay" id="m-overlay" onclick="closeM()"></div>
-    <div class="modal-box" id="m-modal" style="max-width: 800px;">
-        <h2 id="modal-name" style="margin-bottom: 20px; border-bottom: 2px solid #ccc; padding-bottom:10px; font-weight:900; text-transform:uppercase;">İstasyon Analizi</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
-            <div class="card" style="border-left-color:var(--success); margin:0; padding:15px;">
-                <h3 style="font-size:0.85em;">ANLIK OEE</h3>
-                <h2 id="m-oee" style="color:var(--success); font-size:2em;">%0</h2>
-            </div>
-            <div class="card" style="border-left-color:var(--warning); margin:0; padding:15px;">
-                <h3 style="font-size:0.85em;">ENERJİ TÜKETİMİ</h3>
-                <h2 id="m-p" style="color:var(--warning); font-size:2em;">0 <small style="font-size:0.4em; color:#333;">kW/h</small></h2>
-            </div>
-            <div class="card" style="border-left-color:#3b82f6; margin:0; padding:15px;">
-                <h3 style="font-size:0.85em;">SICAKLIK</h3>
-                <h2 id="m-t" style="color:#3b82f6; font-size:2em;">0 <small style="font-size:0.4em; color:#333;">°C</small></h2>
-            </div>
-            <div class="card" style="border-left-color:#8b5cf6; margin:0; padding:15px;">
-                <h3 style="font-size:0.85em;">ÜRETİLEN</h3>
-                <h2 id="m-prod" style="color:#8b5cf6; font-size:2em;">0</h2>
-            </div>
-            <div class="card" style="border-left-color:var(--danger); margin:0; padding:15px;">
-                <h3 style="font-size:0.85em;">FİRE</h3>
-                <h2 id="m-def" style="color:var(--danger); font-size:2em;">0</h2>
-            </div>
-            <div class="card" style="border-left-color:#10b981; margin:0; padding:15px;">
-                <h3 style="font-size:0.85em;">ÇALIŞMA SÜRESİ</h3>
-                <h2 id="m-uptime" style="color:#10b981; font-size:1.5em; line-height:1.3;">0s 0d</h2>
-            </div>
-        </div>
-        <button class="login-btn" style="width:100%; margin-top:25px; background:var(--border);" onclick="closeM()">⬅ GERİ DÖN</button>
-    </div>
-
     <script>
         let updateSpeed = 4000; 
         let running = true, pCount = 0, dCount = 0, dtStart = null, dtInt = null, ws = null, selSt = "", eChart, pChart, notifCount = 0;
         let simInterval = null;
         
-        let historicalPlannedSeconds = 3600; 
-        let historicalUnplannedSeconds = 1200; 
-        let livePlannedSeconds = 0;
-        let liveUnplannedSeconds = 0;
-        
+        let totalPlannedDowntime = 0;
+        let totalUnplannedDowntime = 0;
         let dtType = "";
         let simStartTime = Date.now();
         let editingWoId = null;
@@ -531,7 +496,7 @@
                     const row = `<tr>
                         <td>#${wo.id}</td>
                         <td>${wo.name} (${wo.code})</td>
-                        <td>${wo.client}</td>
+                        <td>-</td>
                         <td>${prioHtml}</td>
                         <td>${statusHtml}</td>
                         <td>${wo.time}</td>
@@ -550,7 +515,7 @@
                     const row = `<tr>
                         <td>#${wo.id}</td>
                         <td>${wo.name} (${wo.code})</td>
-                        <td>${wo.client}</td>
+                        <td>-</td>
                         <td>${prioHtml}</td>
                         <td>${statusHtml}</td>
                         <td>${wo.time}</td>
@@ -661,6 +626,7 @@
             }
         }
 
+        // ESKİ STİL VE ESNEK DURUŞ YÖNETİMİ MANTIĞI GERİ GETİRİLDİ
         function goDtStep2(n) { 
             selSt = n; 
             $('#dt-sel-st').text(n); 
@@ -670,28 +636,21 @@
         
         function goDt3(t) {
             $('#ds2').removeClass('active'); $('#ds3').addClass('active'); 
+            dtType = t;
             const div = $('#dt-reasons').empty();
             const r = t==='Planlı' ? ['Mola', 'Vardiya Değişimi', 'Planlı Bakım', 'Bayram Tatili'] : ['Arıza', 'Kalite Sorunu', 'Hammadde Bekleme'];
             r.forEach(x => { $('<button>').addClass('dt-btn').css('background', t==='Planlı'?'#d97706':'#df2311').text(x).click(() => startDt(x, t)).appendTo(div); });
         }
         
         function calculateOEE() {
-            let shiftBaseSeconds = 28800; 
-            let liveElapsed = Math.floor((Date.now() - simStartTime) / 1000);
-            let totalElapsed = shiftBaseSeconds + liveElapsed;
+            let totalShiftTime = 480; 
+            let unplannedLoss = totalUnplannedDowntime / 10; 
+            let availability = (totalShiftTime - unplannedLoss) / totalShiftTime;
             
-            let totalPlanned = historicalPlannedSeconds + livePlannedSeconds;
-            let totalUnplanned = historicalUnplannedSeconds + liveUnplannedSeconds;
-            
-            let plannedProdTime = totalElapsed - totalPlanned;
-            if (plannedProdTime <= 0) plannedProdTime = shiftBaseSeconds;
-            
-            let operatingTime = plannedProdTime - totalUnplanned;
-            let availability = operatingTime / plannedProdTime;
             if (availability > 1) availability = 1;
-            if (availability < 0) availability = 0;
+            if (availability < 0.6) availability = 0.6;
             
-            let quality = (pCount + 15000) > 0 ? (((pCount + 15000) - (dCount + 45)) / (pCount + 15000)) : 0.997;
+            let quality = pCount > 0 ? ((pCount - dCount) / pCount) : 0.997;
             let performance = 0.991;
             
             return (availability * performance * quality * 100).toFixed(1);
@@ -700,6 +659,7 @@
         function updateOeeDisplay() {
             let oee = calculateOEE();
             $('#kpi-o').text('%' + oee);
+            $('#wo-q').text('%' + oee);
             
             const mBody = $('#m-table-body').empty();
             const mList = $('#machine-list').empty();
@@ -729,12 +689,14 @@
             }
         }
 
-        function startDt(r, type) { 
+        function startDt(r, t) { 
             running = false; 
             dtStart = Date.now(); 
-            dtType = type;
+            dtType = t;
             $('#ds3').removeClass('active'); $('#ds4').addClass('active'); 
-            $('#status-card').removeClass('status-ok').css({'border-left-color':'var(--danger)'}).find('h1').css('color','var(--danger)').text("DURUŞ AKTİF: " + selSt); 
+            
+            let color = t === 'Planlı' ? 'var(--warning)' : 'var(--danger)';
+            $('#status-card').removeClass('status-ok').css({'border-left-color': color}).find('h1').css('color', color).text("DURUŞ AKTİF: " + selSt); 
             $('#status-card p').text("Sebebi: " + r);
             addLog(`${selSt} İSTASYONU DURDURULDU: ${r}`, 'red'); 
             
@@ -742,21 +704,22 @@
                 let s = Math.floor((Date.now()-dtStart)/1000); 
                 $('#dt-timer').text(new Date(s*1000).toISOString().substr(11,8)); 
                 
-                if (dtType === "Planlı") {
-                    livePlannedSeconds++;
+                if (dtType === "Plansız") {
+                    totalUnplannedDowntime += 1; 
                 } else {
-                    liveUnplannedSeconds++;
+                    totalPlannedDowntime += 1; 
                 }
                 updateOeeDisplay();
             }, 1000); 
         }
+
         function stopDt() { 
             running = true; 
             clearInterval(dtInt); 
             dtStart = null;
             dtType = "";
             $('#ds4').removeClass('active'); $('#ds1').addClass('active'); 
-            $('#status-card').addClass('status-ok').css({'border-left-color':'var(--success)'}).find('h1').css('color','var(--success)').text("ÜRETİM AKTİF"); 
+            $('#status-card').addClass('status-ok').css({'border-left-color':'var(--success)'}).find('h1').css('color':'var(--success)').text("ÜRETİM AKTİF"); 
             $('#status-card p').text("Sistem senkronize çalışıyor."); 
             addLog(`${selSt} TEKRAR DEVREYE ALINDI`, 'green'); 
             updateOeeDisplay();
@@ -847,7 +810,7 @@
                 data.push(Math.floor(baseP * (0.8 + Math.random() * 0.4)) * (val==='1'?1:7)); 
             }
             eChart.data.labels = labels; eChart.data.datasets[0].data = data;
-            eChart.data.datasets[0].label = mFilter === 'all' ? 'Tesis Toplam Tüketimi (kW/h)' : `${machines.find(m=>m.id===mFilter).n} Tüketimi`;
+            eChart.data.datasets[0].label = mFilter === 'all' ? 'Tüketim (kW/h)' : `${machines.find(m=>m.id===mFilter).n} Tüketimi`;
             eChart.update();
 
             pChart.stop();
