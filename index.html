@@ -25,13 +25,10 @@
         .login-btn:hover { filter: brightness(0.9); }
 
         header { background-color: var(--card-bg); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--primary-gray); box-shadow: var(--shadow); position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; gap: 10px; }
-        .header-left { display: flex; align-items: center; gap: 30px; flex: 1; }
-        .header-center { display: flex; align-items: center; justify-content: center; gap: 15px; flex: 1.5; }
-        .header-right { display: flex; align-items: center; justify-content: flex-end; gap: 15px; flex: 1; }
-        
+        .header-left { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
         .logo { height: 50px; width: auto; object-fit: contain; }
-        .clock-box { font-size: 1.4em; font-weight: 900; background: #ffffff; padding: 6px 18px; border-radius: 8px; border: 3px solid var(--border); font-family: monospace; letter-spacing: 1px; }
-        
+        .clock-box { font-size: 1.4em; font-weight: 700; background: #f0f0f0; padding: 5px 15px; border-radius: 6px; border: 2px solid var(--border); font-family: monospace; }
+        .header-right { display: flex; align-items: center; gap: 15px; }
         .operator-photo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
 
         .notif-bell { position: relative; cursor: pointer; font-size: 1.6em; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; border-radius: 50%; border: 2px solid var(--border); transition: 0.2s; user-select: none; }
@@ -76,9 +73,8 @@
         .dt-step.active { display: block; }
         .dt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
         
-        /* Duruş İstasyon Seçim Modern Kart Tasarımı */
-        .st-select-btn { background: #ffffff; color: #333; border: 2px solid #ddd; border-radius: 8px; padding: 18px; font-weight: 900; font-size: 1.1em; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.04); }
-        .st-select-btn:hover { border-color: #888; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+        .st-select-btn { background: #ffffff; color: #000000; border: 2px solid var(--border); border-radius: 6px; padding: 20px; font-weight: 900; font-size: 1.1em; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-transform: uppercase; }
+        .st-select-btn:hover { background: #f0f0f0; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
         
         .dt-btn { padding: 15px; font-weight: 900; cursor: pointer; border: 2px solid var(--border); border-radius: 8px; color: white; font-size: 1.1em; transition: 0.2s; }
         .dt-btn:active { transform: scale(0.95); }
@@ -87,12 +83,13 @@
 
         @media screen and (max-width: 768px) {
             header { flex-direction: column; align-items: flex-start; padding: 10px; }
-            .header-left, .header-center, .header-right { width: 100%; justify-content: space-between; margin-top: 10px; }
+            .header-right { width: 100%; justify-content: space-between; margin-top: 10px; }
             .header-slogan { display: none; }
             .dashboard-grid { grid-template-columns: 1fr !important; }
             .chart-wrapper { height: 300px; }
             .modal-box { padding: 15px; width: 90vw; }
             .modal-box .card h2 { font-size: 2em !important; }
+            .dt-grid { grid-template-columns: 1fr; }
         }
 
         @media screen and (orientation: landscape) and (max-height: 500px) {
@@ -131,16 +128,15 @@
     <div id="main-dashboard" style="display:none;">
         <header>
             <div class="header-left">
-                <img src="download.png" class="logo" title="SUBÜ" alt="SUBU" style="height: 55px;">
+                <img src="download.png" class="logo" title="SUBÜ" alt="SUBU">
                 <div class="clock-box" id="live-clock">00:00:00</div>
+                <img src="FOTM.jpg" class="logo" title="FOT-M" alt="FOT-M">
+                
+                <div style="display: flex; align-items: center; gap: 8px;" class="header-slogan">
+                    <img src="uretimingelecegilogobeyaz.png" class="logo" style="height: 45px;" alt="Slogan">
+                    <span style="font-weight: 900; font-size: 0.8em; line-height: 1.2;">ÜRETİMİN GELECEĞİ<br><small style="color:#555;">BİZİM ELİMİZDE</small></span>
+                </div>
             </div>
-            
-            <div class="header-center">
-                <img src="FOTM.jpg" class="logo" title="FOT-M" alt="FOT-M" style="height: 60px; border-radius: 50%;">
-                <img src="uretimingelecegilogobeyaz.png" class="logo" style="height: 50px;" alt="Slogan Logo">
-                <span style="font-weight: 900; font-size: 0.85em; line-height: 1.2; text-align: left;">ÜRETİMİN GELECEĞİ<br><small style="color:#555;">BİZİM ELİMİZDE</small></span>
-            </div>
-
             <div class="header-right">
                 <div style="text-align: right; margin-left: 10px;">
                     <p id="op-name" style="font-weight:900; font-size: 1.1em;"></p>
@@ -227,28 +223,28 @@
             </div>
 
             <div id="t3" class="tab-content" style="display:none;">
-                <div class="card" style="max-width: 1000px; margin: 0 auto; padding: 30px;">
+                <div class="card" style="max-width: 1000px; margin: 0 auto;">
                     <div id="ds1" class="dt-step active">
-                        <h3 style="margin-bottom: 20px; font-size: 1.2em; border-bottom: 2px solid #eee; padding-bottom: 10px;">1. ADIM: İSTASYON SEÇİN</h3>
+                        <h3>1. ADIM: İSTASYON SEÇİN</h3>
                         <div class="dt-grid" id="dt-st-list"></div>
                     </div>
                     <div id="ds2" class="dt-step">
-                        <h3 style="margin-bottom: 20px; font-size: 1.2em; border-bottom: 2px solid #eee; padding-bottom: 10px;">2. ADIM: DURUŞ TİPİ SEÇİN (<span id="dt-sel-st"></span>)</h3>
+                        <h3>2. ADIM: DURUŞ TİPİ SEÇİN (<span id="dt-sel-st"></span>)</h3>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                             <button class="dt-btn" style="background:var(--warning);" onclick="goDt3('Planlı')">PLANLI DURUŞ</button>
                             <button class="dt-btn" style="background:var(--danger);" onclick="goDt3('Plansız')">PLANSIZ DURUŞ</button>
                         </div>
-                        <button class="login-btn" style="margin-top:30px; background:var(--primary-gray);" onclick="$('#ds2').removeClass('active'); $('#ds1').addClass('active');">GERİ</button>
+                        <button class="login-btn" style="margin-top:20px; background:var(--primary-gray);" onclick="$('#ds2').removeClass('active'); $('#ds1').addClass('active');">⬅ İPTAL / GERİ</button>
                     </div>
                     <div id="ds3" class="dt-step">
-                        <h3 style="margin-bottom: 20px; font-size: 1.2em; border-bottom: 2px solid #eee; padding-bottom: 10px;">3. ADIM: DURUŞ SEBEBİ</h3>
-                        <div id="dt-reasons" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"></div>
-                        <button class="login-btn" style="margin-top:30px; background:var(--primary-gray);" onclick="$('#ds3').removeClass('active'); $('#ds2').addClass('active');">GERİ</button>
+                        <h3>3. ADIM: DURUŞ SEBEBİ</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;" id="dt-reasons"></div>
+                        <button class="login-btn" style="margin-top:20px; background:var(--primary-gray);" onclick="$('#ds3').removeClass('active'); $('#ds2').addClass('active');">⬅ GERİ</button>
                     </div>
                     <div id="ds4" class="dt-step">
-                        <h2 style="color:var(--danger); text-align:center; font-size: 2em; margin-bottom: 10px;">MAKİNE DURDURULDU</h2>
-                        <h1 id="dt-timer" style="font-size:6em; text-align:center; font-family:monospace; margin:20px 0;">00:00:00</h1>
-                        <button class="login-btn" style="background:var(--success); width:100%; font-size:1.5em; padding:25px; border-radius: 12px;" onclick="stopDt()">ÜRETİME GERİ DÖN</button>
+                        <h2 style="color:var(--danger); text-align:center;">MAKİNE DURDURULDU</h2>
+                        <h1 id="dt-timer" style="font-size:5em; text-align:center; font-family:monospace; margin:20px 0;">00:00:00</h1>
+                        <button class="login-btn" style="background:var(--success); width:100%; font-size:1.5em; padding:25px;" onclick="stopDt()">▶ ÜRETİME GERİ DÖN</button>
                     </div>
                 </div>
             </div>
@@ -390,61 +386,30 @@
         <button class="login-btn" style="background:var(--border);" onclick="$('#wo-overlay, #wo-details-modal').fadeOut();">KAPAT</button>
     </div>
 
-    <div class="overlay" id="m-overlay" onclick="closeM()"></div>
-    <div class="modal-box" id="m-modal" style="max-width: 800px;">
-        <h2 id="modal-name" style="margin-bottom: 20px; border-bottom: 2px solid #ccc; padding-bottom:10px; font-weight:900; text-transform:uppercase;">İstasyon Analizi</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
-            <div class="card" style="border-left-color:var(--success); margin:0; padding:15px;">
-                <h3 style="font-size:0.85em;">ANLIK OEE</h3>
-                <h2 id="m-oee" style="color:var(--success); font-size:2em;">%0</h2>
-            </div>
-            <div class="card" style="border-left-color:var(--warning); margin:0; padding:15px;">
-                <h3 style="font-size:0.85em;">ENERJİ TÜKETİMİ</h3>
-                <h2 id="m-p" style="color:var(--warning); font-size:2em;">0 <small style="font-size:0.4em; color:#333;">kW/h</small></h2>
-            </div>
-            <div class="card" style="border-left-color:#3b82f6; margin:0; padding:15px;">
-                <h3 style="font-size:0.85em;">SICAKLIK</h3>
-                <h2 id="m-t" style="color:#3b82f6; font-size:2em;">0 <small style="font-size:0.4em; color:#333;">°C</small></h2>
-            </div>
-            <div class="card" style="border-left-color:#8b5cf6; margin:0; padding:15px;">
-                <h3 style="font-size:0.85em;">ÜRETİLEN</h3>
-                <h2 id="m-prod" style="color:#8b5cf6; font-size:2em;">0</h2>
-            </div>
-            <div class="card" style="border-left-color:var(--danger); margin:0; padding:15px;">
-                <h3 style="font-size:0.85em;">FİRE</h3>
-                <h2 id="m-def" style="color:var(--danger); font-size:2em;">0</h2>
-            </div>
-            <div class="card" style="border-left-color:#10b981; margin:0; padding:15px;">
-                <h3 style="font-size:0.85em;">ÇALIŞMA SÜRESİ</h3>
-                <h2 id="m-uptime" style="color:#10b981; font-size:1.5em; line-height:1.3;">0s 0d</h2>
-            </div>
-        </div>
-        <button class="login-btn" style="width:100%; margin-top:25px; background:var(--border);" onclick="closeM()">⬅ GERİ DÖN</button>
-    </div>
-
     <script>
-        let updateSpeed = 8000; 
-        let running = true, pCount = 0, dCount = 0, dtStart = null, dtInt = null, ws = null, selSt = "", eChart, pChart, notifCount = 0;
+        let updateSpeed = 6000; 
+        let running = true, pCount = 1420, dCount = 11, dtStart = null, dtInt = null, ws = null, selSt = "", eChart, pChart, notifCount = 0;
         let simInterval = null;
         
-        let totalPlannedDowntime = 0;
-        let totalUnplannedDowntime = 0;
+        let historicalPlannedSeconds = 3600; 
+        let historicalUnplannedSeconds = 1200; 
+        let livePlannedSeconds = 0;
+        let liveUnplannedSeconds = 0;
+        
         let dtType = "";
         let simStartTime = Date.now();
         let editingWoId = null;
 
         let workOrders = [
-            {id: 7822, code: 'P-101', name: 'PLC KONTROL KARTI', client: '-', priority: 'ACİL', status: 'AKTİF ÜRETİM', time: '08:00', endTime: '-', target: 2500, produced: 420, defect: 1, op: 'Muhammed Arda Sarı', cycle: '1.2'},
+            {id: 7822, code: 'P-101', name: 'PLC KONTROL KARTI', client: '-', priority: 'ACİL', status: 'AKTİF ÜRETİM', time: '08:00', endTime: '-', target: 2500, produced: 1420, defect: 11, op: 'Muhammed Arda Sarı', cycle: '1.2'},
             {id: 7824, code: 'S-440', name: 'PNÖMATİK VALF', client: '-', priority: 'ACİL', status: 'BEKLEYEN', time: '13:00', endTime: '-', target: 150, produced: 0, defect: 0, op: 'Muhammed Arda Sarı', cycle: '1.8'},
-            {id: 7826, code: 'F-112', name: 'FREN DİSKİ', client: '-', priority: 'ACİL', status: 'BEKLEYEN', time: '15:00', endTime: '-', target: 1200, produced: 0, defect: 0, op: 'Kemal Yılmaz', cycle: '2.1'},
+            {id: 7829, code: 'K-202', name: 'KONTROL PANELİ', client: '-', priority: 'ACİL', status: 'BEKLEYEN', time: '14:15', endTime: '-', target: 500, produced: 0, defect: 0, op: 'Hakan Çelik', cycle: '2.0'},
             {id: 7823, code: 'M-110', name: 'REDÜKTÖR DİŞLİSİ', client: '-', priority: 'NORMAL', status: 'BEKLEYEN', time: '11:00', endTime: '-', target: 300, produced: 0, defect: 0, op: 'Hakan Çelik', cycle: '2.5'},
-            {id: 7825, code: 'E-505', name: 'EGZOZ MANİFOLDU', client: '-', priority: 'NORMAL', status: 'BEKLEYEN', time: '14:30', endTime: '-', target: 450, produced: 0, defect: 0, op: 'Muhammed Arda Sarı', cycle: '4.5'},
-            {id: 7827, code: 'M-220', name: 'MOTOR BLOĞU', client: '-', priority: 'NORMAL', status: 'BEKLEYEN', time: '16:00', endTime: '-', target: 80, produced: 0, defect: 0, op: 'Hasan Şahin', cycle: '15.0'},
-            {id: 7819, code: 'S-202', name: 'SENSÖR MODÜLÜ', client: '-', priority: 'NORMAL', status: 'TAMAMLANDI', time: '02:00', endTime: '06:30', target: 800, produced: 800, defect: 2, op: 'Ahmet Yılmaz', cycle: '1.5'},
-            {id: 7820, code: 'G-305', name: 'SERVO MOTOR SÜRÜCÜ', client: '-', priority: 'NORMAL', status: 'TAMAMLANDI', time: '04:00', endTime: '09:15', target: 1000, produced: 1000, defect: 5, op: 'Can Tekin', cycle: '2.0'},
-            {id: 7814, code: 'K-99', name: 'KAPORTA SACI', client: '-', priority: 'NORMAL', status: 'TAMAMLANDI', time: '09:00', endTime: '11:30', target: 200, produced: 200, defect: 0, op: 'Ali Demir', cycle: '5.5'},
-            {id: 7813, code: 'C-01', name: 'CAM KRİKOSU', client: '-', priority: 'NORMAL', status: 'TAMAMLANDI', time: '07:30', endTime: '10:00', target: 600, produced: 600, defect: 3, op: 'Veli Kaya', cycle: '1.2'},
-            {id: 7815, code: 'H-902', name: 'HİDROLİK POMPA GÖVDESİ', client: '-', priority: 'NORMAL', status: 'TAMAMLANDI', time: '22:00', endTime: '03:45', target: 500, produced: 500, defect: 1, op: 'Efe Şen', cycle: '3.0'}
+            {id: 7828, code: 'T-303', name: 'TERMOKUPIL SENSÖR', client: '-', priority: 'NORMAL', status: 'BEKLEYEN', time: '15:40', endTime: '-', target: 1000, produced: 0, defect: 0, op: 'Can Tekin', cycle: '1.1'},
+            {id: 7819, code: 'S-202', name: 'SENSÖR MODÜLÜ', client: '-', priority: 'NORMAL', status: 'TAMAMLANDI', time: '02:00', endTime: '06:30', target: 800, produced: 800, defect: 4, op: 'Ahmet Yılmaz', cycle: '1.5'},
+            {id: 7820, code: 'G-305', name: 'SERVO MOTOR SÜRÜCÜ', client: '-', priority: 'NORMAL', status: 'TAMAMLANDI', time: '04:00', endTime: '09:15', target: 1000, produced: 1000, defect: 7, op: 'Can Tekin', cycle: '2.0'},
+            {id: 7817, code: 'R-701', name: 'RÖLE KARTI SÜRÜCÜSÜ', client: '-', priority: 'NORMAL', status: 'TAMAMLANDI', time: '05:20', endTime: '10:45', target: 1200, produced: 1200, defect: 9, op: 'Ali Demir', cycle: '1.4'},
+            {id: 7815, code: 'H-902', name: 'HİDROLİK POMPA GÖVDESİ', client: '-', priority: 'NORMAL', status: 'TAMAMLANDI', time: '22:00', endTime: '03:45', target: 500, produced: 500, defect: 3, op: 'Efe Şen', cycle: '3.0'}
         ];
         
         let machines = [
@@ -465,65 +430,145 @@
             {id:'M15', n:'Fırın 2', o:75, p:235, t: 185, prod: 580, def: 30, uptime: '4s 30d'}
         ];
 
-        async function login() {
-            const u = $('#username').val().toLowerCase().trim(), p = $('#password').val().trim();
-            try {
-                const res = await fetch('https://meskariyergunu.onrender.com/api/login', {
-                    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p})
-                });
-                const data = await res.json();
-                if(res.ok) { 
-                    $('#login-modal').fadeOut(); $('#main-dashboard').fadeIn(); 
-                    $('#op-name').text(data.name); $('#op-img').attr('src', data.photo); 
-                    init(); 
-                } else { 
-                    $('#login-error').fadeIn().text("Kullanıcı adı veya şifre hatalı!"); 
-                }
-            } catch(e) { 
-                $('#login-error').fadeIn().text("Sunucuya ulaşılamıyor (Render uyanıyor olabilir)."); 
-            }
-        }
-
         function tab(e, id) { 
             $('.tab-content').hide(); $('.tab-btn').removeClass('active'); 
             $('#'+id).show(); if(e) $(e.currentTarget).addClass('active'); 
             if(id === 't4') { updateEnergyChart(); }
         }
 
-        function addLog(m, cls) { 
-            const t = new Date().toLocaleTimeString(); 
-            $('#log-list').prepend(`<div style="color:${cls}; border-bottom:1px solid #ddd; padding:8px;">[${t}] ${m}</div>`); 
-            notifCount++;
-            $('#notif-count').text(notifCount);
-            $('#notif-list').prepend(`<div class="notif-item" style="border-left-color:${cls==='red'?'var(--danger)':'var(--success)'}; color:#333;">[${t}] ${m}</div>`);
-        }
-
-        function clearNotifs() {
-            notifCount = 0; $('#notif-count').text("0"); $('#notif-list').empty(); $('#notif-panel').fadeOut();
-        }
-
-        function openM(id) { 
-            const m = machines.find(x => x.id === id); 
-            $('#modal-name').text(m.n + " İstasyon Verileri"); 
-            $('#m-oee').text('%' + m.o); $('#m-p').html(`${m.p} <small style="font-size:0.4em; color:#333;">kW/h</small>`); $('#m-t').html(`${m.t} <small style="font-size:0.4em; color:#333;">°C</small>`);
-            $('#m-prod').text(m.prod); $('#m-def').text(m.def); $('#m-uptime').text(m.uptime);
-            $('#m-overlay, #m-modal').fadeIn(); 
-        }
-        function closeM() { $('#m-overlay, #m-modal').fadeOut(); }
-
-        function openWoModal() {
-            editingWoId = null;
-            $('#wo-modal-title').text('YENİ İŞ EMRİ OLUŞTUR');
-            $('.form-input').val(''); 
-            $('#m-wo-client').val('-'); 
-            $('#m-wo-op').val('Muhammed Arda Sarı');
-            $('#m-wo-priority').val('NORMAL');
-            $('#m-wo-status').val('BEKLEYEN');
-            $('#m-wo-cycle').val('1.5');
+        function editWO(id) {
+            let wo = workOrders.find(x => x.id === id);
+            if(!wo) return;
+            editingWoId = id;
+            $('#wo-modal-title').text(`İŞ EMRİ DÜZENLE: #${id}`);
+            $('#m-wo-code').val(wo.code);
+            $('#m-wo-name').val(wo.name);
+            $('#m-wo-client').val('-');
+            $('#m-wo-op').val(wo.op);
+            $('#m-wo-target').val(wo.target);
+            $('#m-wo-priority').val(wo.priority);
+            $('#m-wo-status').val(wo.status);
+            $('#m-wo-cycle').val(wo.cycle);
             $('#wo-overlay, #wo-modal').fadeIn();
         }
-        function closeWoModal() { $('#wo-overlay, #wo-modal').fadeOut(); }
+
+        function completeWO(id) {
+            let wo = workOrders.find(x => x.id === id);
+            if(wo) {
+                wo.status = 'TAMAMLANDI';
+                wo.endTime = new Date().toLocaleTimeString().substr(0,5);
+                addLog("İş Emri Tamamlandı: #" + id, "green");
+                renderWorkOrders();
+            }
+        }
+
+        function viewWoDetails(id) {
+            let wo = workOrders.find(x => x.id === id);
+            if(!wo) return;
+            $('#det-wo-id').text(`#${wo.id}`);
+            $('#det-wo-status').text(wo.status);
+            $('#det-wo-name').text(wo.name);
+            $('#det-wo-code').text(wo.code);
+            $('#det-wo-client').text('-');
+            $('#det-wo-priority').text(wo.priority);
+            $('#det-wo-times').text(`${wo.time} / ${wo.endTime}`);
+            $('#det-wo-op').text(wo.op);
+            $('#det-wo-target').text(wo.target);
+            $('#det-wo-prod').text(wo.produced);
+            $('#det-wo-def').text(wo.defect);
+            $('#det-wo-cycle').text(wo.cycle);
+            $('#wo-overlay, #wo-details-modal').fadeIn();
+        }
+
+        function deleteWO(id) {
+            if(confirm("Bu iş emrini listeden silmek istediğinize emin misiniz?")) {
+                workOrders = workOrders.filter(x => x.id !== id);
+                addLog("İş Emri #" + id + " silindi.", "orange");
+                renderWorkOrders();
+            }
+        }
+
+        function goDtStep2(n) { selSt = n; $('#dt-sel-st').text(n); $('#ds1').removeClass('active'); $('#ds2').addClass('active'); }
         
+        function goDt3(t) {
+            $('#ds2').removeClass('active'); $('#ds3').addClass('active'); 
+            dtType = t;
+            const div = $('#dt-reasons').empty();
+            const r = t==='Planlı' ? ['Mola', 'Vardiya Değişimi', 'Planlı Bakım', 'Bayram Tatili'] : ['Arıza', 'Kalite Sorunu', 'Hammadde Bekleme'];
+            r.forEach(x => { $('<button>').addClass('dt-btn').css('background', t==='Planlı'?'#d97706':'#df2311').text(x).click(() => startDt(x)).appendTo(div); });
+        }
+        
+        function startDt(r) { 
+            running = false; dtStart = Date.now(); $('#ds3').removeClass('active'); $('#ds4').addClass('active'); 
+            let color = dtType === 'Planlı' ? 'var(--warning)' : 'var(--danger)';
+            $('#status-card').removeClass('status-ok').css({'border-left-color': color}).find('h1').css('color', color).text("DURUŞ AKTİF: " + selSt); 
+            $('#status-card p').text("Sebebi: " + r);
+            addLog(`${selSt} İSTASYONU DURDURULDU: ${r}`, 'red'); 
+            dtInt = setInterval(() => { 
+                let s = Math.floor((Date.now()-dtStart)/1000); 
+                $('#dt-timer').text(new Date(s*1000).toISOString().substr(11,8)); 
+                if (dtType === "Plansız") {
+                    totalUnplannedDowntime += 1; 
+                } else {
+                    totalPlannedDowntime += 1; 
+                }
+                updateOeeDisplay();
+            }, 1000); 
+        }
+        
+        function stopDt() { 
+            running = true; clearInterval(dtInt); $('#ds4').removeClass('active'); $('#ds1').addClass('active'); 
+            $('#status-card').addClass('status-ok').css({'border-left-color':'var(--success)'}).find('h1').css('color':'var(--success)').text("ÜRETİM AKTİF"); 
+            $('#status-card p').text("Sistem senkronize çalışıyor."); addLog(`${selSt} TEKRAR DEVREYE ALINDI`, 'green'); 
+            updateOeeDisplay();
+        }
+
+        function calculateOEE() {
+            let totalShiftTime = 28800; 
+            let unplannedLoss = totalUnplannedDowntime; 
+            let availability = (totalShiftTime - unplannedLoss) / totalShiftTime;
+            
+            if (availability > 1) availability = 1;
+            if (availability < 0.6) availability = 0.6;
+            
+            let quality = pCount > 0 ? ((pCount - dCount) / pCount) : 0.995;
+            let performance = 0.992;
+            
+            return (availability * performance * quality * 100).toFixed(1);
+        }
+
+        function updateOeeDisplay() {
+            let oee = calculateOEE();
+            $('#kpi-o').text('%' + oee);
+            
+            const mBody = $('#m-table-body').empty();
+            const mList = $('#machine-list').empty();
+            
+            machines.forEach((m, idx) => {
+                let stationVariance = (idx % 2 === 0 ? 0.3 : -0.4) + Math.sin(Date.now() / 30000 + idx) * 0.05;
+                let calculatedStationOee = (parseFloat(oee) + stationVariance);
+                if (calculatedStationOee > 100) calculatedStationOee = 100;
+                m.o = calculatedStationOee.toFixed(1);
+                
+                mBody.append(`<tr><td>${m.n}</td><td>${running ? 'Aktif' : 'Duruşta'}</td><td>%${m.o}</td><td>${m.p}</td></tr>`);
+                
+                $('<div class="st-card">')
+                    .html(`<h4 style="color:var(--border);">${m.n}</h4><span style="color:var(--success); font-size:0.8em; font-weight:900;">● Çevrimiçi</span><br><br><small style="font-weight:700;">OEE: %${m.o}</small><br><small style="font-weight:700;">Güç: ${m.p} kW/h</small>`)
+                    .click(() => openM(m.id)).appendTo(mList);
+            });
+            
+            if ($('#m-modal').is(':visible') && selSt) {
+                const m = machines.find(x => x.n === selSt || selSt.includes(x.n));
+                if (m) {
+                    $('#m-oee').text('%' + m.o);
+                    $('#m-p').html(`${m.p} <small style="font-size:0.4em; color:#333;">kW/h</small>`);
+                    $('#m-t').html(`${m.t} <small style="font-size:0.4em; color:#333;">°C</small>`);
+                    $('#m-prod').text(m.prod);
+                    $('#m-def').text(m.def);
+                }
+            }
+        }
+
         function renderWorkOrders() {
             const activeBody = $('#wo-tbody').empty();
             const completedBody = $('#wo-completed-tbody').empty();
@@ -602,7 +647,7 @@
                 if(wo) {
                     wo.code = code; wo.name = name; wo.client = client; wo.op = op;
                     wo.target = target; wo.priority = priority; wo.status = status; wo.cycle = cycle;
-                    addLog(`İş Emri Güncellendi: #${wo.id}`, 'blue');
+                    addLog("İş Emri Güncellendi: #" + wo.id, "blue");
                 }
             } else {
                 const randId = Math.floor(Math.random() * 9000) + 1000; 
@@ -612,168 +657,11 @@
                     status: status, time: time, endTime: '-', target: target, produced: 0, defect: 0, op: op, cycle: cycle
                 };
                 if(priority === 'ACİL') { workOrders.unshift(newWo); } else { workOrders.push(newWo); }
-                addLog(`Yeni İş Emri Eklendi: #${randId} - ${name}`, 'green');
+                addLog("Yeni İş Emri Eklendi: #" + randId + " - " + name, "green");
             }
             
             closeWoModal();
             renderWorkOrders();
-        }
-
-        function editWO(id) {
-            let wo = workOrders.find(x => x.id === id);
-            if(!wo) return;
-            editingWoId = id;
-            $('#wo-modal-title').text(`İŞ EMRİ DÜZENLE: #${id}`);
-            $('#m-wo-code').val(wo.code);
-            $('#m-wo-name').val(wo.name);
-            $('#m-wo-client').val('-');
-            $('#m-wo-op').val(wo.op);
-            $('#m-wo-target').val(wo.target);
-            $('#m-wo-priority').val(wo.priority);
-            $('#m-wo-status').val(wo.status);
-            $('#m-wo-cycle').val(wo.cycle);
-            $('#wo-overlay, #wo-modal').fadeIn();
-        }
-
-        function completeWO(id) {
-            let wo = workOrders.find(x => x.id === id);
-            if(wo) {
-                wo.status = 'TAMAMLANDI';
-                wo.endTime = new Date().toLocaleTimeString().substr(0,5);
-                addLog(`İş Emri Tamamlandı: #${id}`, 'green');
-                renderWorkOrders();
-            }
-        }
-
-        function viewWoDetails(id) {
-            let wo = workOrders.find(x => x.id === id);
-            if(!wo) return;
-            $('#det-wo-id').text(`#${wo.id}`);
-            $('#det-wo-status').text(wo.status);
-            $('#det-wo-name').text(wo.name);
-            $('#det-wo-code').text(wo.code);
-            $('#det-wo-client').text('-');
-            $('#det-wo-priority').text(wo.priority);
-            $('#det-wo-times').text(`${wo.time} / ${wo.endTime}`);
-            $('#det-wo-op').text(wo.op);
-            $('#det-wo-target').text(wo.target);
-            $('#det-wo-prod').text(wo.produced);
-            $('#det-wo-def').text(wo.defect);
-            $('#det-wo-cycle').text(wo.cycle);
-            $('#wo-overlay, #wo-details-modal').fadeIn();
-        }
-
-        function deleteWO(id) {
-            if(confirm("Bu iş emrini listeden silmek istediğinize emin misiniz?")) {
-                workOrders = workOrders.filter(x => x.id !== id);
-                addLog(`İş Emri #${id} silindi.`, "orange");
-                renderWorkOrders();
-            }
-        }
-
-        function goDtStep2(n) { 
-            selSt = n; 
-            $('#dt-sel-st').text(n); 
-            $('#ds1').removeClass('active'); 
-            $('#ds2').addClass('active'); 
-        }
-        
-        function goDt3(t) {
-            $('#ds2').removeClass('active'); $('#ds3').addClass('active'); 
-            dtType = t;
-            const div = $('#dt-reasons').empty();
-            const r = t==='Planlı' ? ['Mola', 'Vardiya Değişimi', 'Planlı Bakım', 'Bayram Tatili'] : ['Arıza', 'Kalite Sorunu', 'Hammadde Bekleme'];
-            
-            r.forEach(x => { 
-                $('<button>')
-                    .addClass('dt-btn')
-                    .css('background', t==='Planlı' ? '#d97706' : '#df2311')
-                    .text(x)
-                    .click(() => startDt(x, t))
-                    .appendTo(div); 
-            });
-        }
-        
-        function startDt(r, t) { 
-            running = false; 
-            dtStart = Date.now(); 
-            dtType = t;
-            $('#ds3').removeClass('active'); $('#ds4').addClass('active'); 
-            
-            let color = t === 'Planlı' ? 'var(--warning)' : 'var(--danger)';
-            $('#status-card').removeClass('status-ok').css({'border-left-color': color}).find('h1').css('color', color).text("DURUŞ AKTİF: " + selSt); 
-            $('#status-card p').text("Sebebi: " + r);
-            addLog(`${selSt} İSTASYONU DURDURULDU: ${r}`, 'red'); 
-            
-            dtInt = setInterval(() => { 
-                let s = Math.floor((Date.now()-dtStart)/1000); 
-                $('#dt-timer').text(new Date(s*1000).toISOString().substr(11,8)); 
-                
-                if (dtType === "Plansız") {
-                    totalUnplannedDowntime += 1; 
-                } else {
-                    totalPlannedDowntime += 1; 
-                }
-                updateOeeDisplay();
-            }, 1000); 
-        }
-
-        function stopDt() { 
-            running = true; 
-            clearInterval(dtInt); 
-            dtStart = null;
-            dtType = "";
-            $('#ds4').removeClass('active'); $('#ds1').addClass('active'); 
-            $('#status-card').addClass('status-ok').css({'border-left-color':'var(--success)'}).find('h1').css('color':'var(--success)').text("ÜRETİM AKTİF"); 
-            $('#status-card p').text("Sistem senkronize çalışıyor."); 
-            addLog(`${selSt} TEKRAR DEVREYE ALINDI`, 'green'); 
-            updateOeeDisplay();
-        }
-
-        function calculateOEE() {
-            let totalShiftTime = 28800; 
-            let unplannedLoss = totalUnplannedDowntime; 
-            let availability = (totalShiftTime - unplannedLoss) / totalShiftTime;
-            
-            if (availability > 1) availability = 1;
-            if (availability < 0.6) availability = 0.6;
-            
-            let quality = (pCount + 5000) > 0 ? (((pCount + 5000) - (dCount + 10)) / (pCount + 5000)) : 0.998;
-            let performance = 0.992;
-            
-            return (availability * performance * quality * 100).toFixed(1);
-        }
-
-        function updateOeeDisplay() {
-            let oee = calculateOEE();
-            $('#kpi-o').text('%' + oee);
-            
-            const mBody = $('#m-table-body').empty();
-            const mList = $('#machine-list').empty();
-            
-            machines.forEach((m, idx) => {
-                let stationVariance = (idx % 2 === 0 ? 0.1 : -0.2) + Math.sin(Date.now() / 60000 + idx) * 0.05;
-                let calculatedStationOee = (parseFloat(oee) + stationVariance);
-                if (calculatedStationOee > 100) calculatedStationOee = 100;
-                m.o = calculatedStationOee.toFixed(1);
-                
-                mBody.append(`<tr><td>${m.n}</td><td>${running ? 'Aktif' : 'Duruşta'}</td><td>%${m.o}</td><td>${m.p}</td></tr>`);
-                
-                $('<div class="st-card">')
-                    .html(`<h4 style="color:var(--border);">${m.n}</h4><span style="color:var(--success); font-size:0.8em; font-weight:900;">● Çevrimiçi</span><br><br><small style="font-weight:700;">OEE: %${m.o}</small><br><small style="font-weight:700;">Güç: ${m.p} kW/h</small>`)
-                    .click(() => openM(m.id)).appendTo(mList);
-            });
-            
-            if ($('#m-modal').is(':visible') && selSt) {
-                const m = machines.find(x => x.n === selSt || selSt.includes(x.n));
-                if (m) {
-                    $('#m-oee').text('%' + m.o);
-                    $('#m-p').html(`${m.p} <small style="font-size:0.4em; color:#333;">kW/h</small>`);
-                    $('#m-t').html(`${m.t} <small style="font-size:0.4em; color:#333;">°C</small>`);
-                    $('#m-prod').text(m.prod);
-                    $('#m-def').text(m.def);
-                }
-            }
         }
 
         async function listCams() { 
@@ -911,22 +799,23 @@
             simInterval = setInterval(() => { 
                 if(!running) return; 
                 
+                // Tam stabil fabrika akış hızı (Her 6 saniyede 1 parça üretiliyor, OEE stabil)
                 pCount += 1; 
                 
                 let activeWO = workOrders.find(wo => wo.status === 'AKTİF ÜRETİM');
                 if(activeWO) {
                     activeWO.produced += 1;
-                    if(Math.random() > 0.998) {
+                    if(Math.random() > 0.994) {
                         activeWO.defect++;
                         dCount++;
                     }
                     if(activeWO.produced >= activeWO.target) {
                         activeWO.status = 'TAMAMLANDI';
                         activeWO.endTime = new Date().toLocaleTimeString().substr(0,5);
-                        addLog(`İş Emri Hedefe Ulaştı ve Tamamlandı: #${activeWO.id}`, 'green');
+                        addLog("İş Emri Hedefe Ulaştı ve Tamamlandı: #" + activeWO.id, "green");
                     }
                 } else {
-                    if(Math.random() > 0.998) dCount++;
+                    if(Math.random() > 0.996) dCount++;
                 }
                 
                 $('#kpi-p').text(pCount); $('#kpi-d').text(dCount);
@@ -936,6 +825,28 @@
         }
 
         function init() {
+            window.login = login;
+            window.tab = tab;
+            window.editWO = editWO;
+            window.completeWO = completeWO;
+            window.viewWoDetails = viewWoDetails;
+            window.deleteWO = deleteWO;
+            window.goDtStep2 = goDtStep2;
+            window.goDt3 = goDt3;
+            window.startDt = startDt;
+            window.stopDt = stopDt;
+            window.clearNotifs = clearNotifs;
+            window.openWoModal = openWoModal;
+            window.closeWoModal = closeWoModal;
+            window.saveWorkOrder = saveWorkOrder;
+            window.openM = openM;
+            window.closeM = closeM;
+            window.toggleChartType = toggleChartType;
+            window.updateEnergyChart = updateEnergyChart;
+            window.exportExcel = exportExcel;
+            window.startCam = startCam;
+            window.stopCam = stopCam;
+
             setInterval(() => { $('#live-clock').text(new Date().toLocaleTimeString()); }, 1000);
             
             const mFilter = $('#machine-filter');
@@ -964,13 +875,14 @@
             updateOeeDisplay();
             renderWorkOrders();
 
+            // Dakikada bir arka plan istasyon verilerinin hafifçe oynaması (Fabrika Simülasyonu)
             setInterval(() => {
                 if(!running) return;
                 machines.forEach(m => {
                     m.p = Math.max(5, m.p + Math.floor(Math.random() * 3) - 1); 
                     m.t = Math.max(20, m.t + Math.floor(Math.random() * 3) - 1); 
-                    m.prod += 7; 
-                    if(Math.random() > 0.998) m.def += 1; 
+                    m.prod += 1; 
+                    if(Math.random() > 0.995) m.def += 1; 
                 });
                 updateOeeDisplay();
             }, 60000);
