@@ -373,7 +373,7 @@
     </div>
 
     <script>
-        let updateSpeed = 3000; 
+        let updateSpeed = 1000; 
         let running = true, pCount = 0, dCount = 0, dtStart = null, dtInt = null, ws = null, selSt = "", eChart, pChart, notifCount = 0;
         let simInterval = null;
         let totalPlannedDowntime = 0;
@@ -532,9 +532,9 @@
             if (availability > 1) availability = 1;
             if (availability < 0) availability = 0;
             
-            let quality = pCount > 0 ? ((pCount - dCount) / pCount) : 0.994;
-            if (quality < 0.95) quality = 0.95;
-            let performance = 0.982;
+            let quality = pCount > 0 ? ((pCount - dCount) / pCount) : 0.997;
+            if (quality < 0.985) quality = 0.985;
+            let performance = 0.991;
             
             return (availability * performance * quality * 100).toFixed(1);
         }
@@ -548,7 +548,7 @@
             const mList = $('#machine-list').empty();
             
             machines.forEach((m, idx) => {
-                let stationVariance = (idx % 2 === 0 ? 0.4 : -0.6) + Math.sin(Date.now() / 30000 + idx) * 0.1;
+                let stationVariance = (idx % 2 === 0 ? 0.3 : -0.4) + Math.sin(Date.now() / 30000 + idx) * 0.05;
                 let calculatedStationOee = (parseFloat(oee) + stationVariance);
                 if (calculatedStationOee > 100) calculatedStationOee = 100;
                 m.o = calculatedStationOee.toFixed(1);
@@ -576,7 +576,7 @@
             running = false; 
             dtStart = Date.now(); 
             dtType = type;
-            $('#ds3').removeClass('active'); $('#ds4').addClass('active'); 
+            $('#ds3').removeClass('active'); $('#ds4').active || $('#ds4').addClass('active'); 
             $('#status-card').removeClass('status-ok').css({'border-left-color':'var(--danger)'}).find('h1').css('color','var(--danger)').text("DURUŞ AKTİF: " + selSt); 
             $('#status-card p').text("Sebebi: " + r);
             addLog(`${selSt} İSTASYONU DURDURULDU: ${r}`, 'red'); 
@@ -739,8 +739,8 @@
             simInterval = setInterval(() => { 
                 if(!running) return; 
                 
-                pCount += Math.floor(Math.random() * 3) + 4; 
-                if(Math.random() > 0.975) dCount++; 
+                pCount += Math.floor(Math.random() * 5) + 8; 
+                if(Math.random() > 0.988) dCount++; 
                 
                 $('#kpi-p').text(pCount); $('#kpi-d').text(dCount);
                 $('#wo-p').text(pCount);
@@ -778,8 +778,8 @@
                 machines.forEach(m => {
                     m.p = Math.max(5, m.p + Math.floor(Math.random() * 5) - 2); 
                     m.t = Math.max(20, m.t + Math.floor(Math.random() * 3) - 1); 
-                    m.prod += Math.floor(Math.random() * 12) + 8; 
-                    if(Math.random() > 0.96) m.def += 1; 
+                    m.prod += Math.floor(Math.random() * 25) + 30; 
+                    if(Math.random() > 0.993) m.def += 1; 
                 });
                 updateOeeDisplay();
             }, 60000);
