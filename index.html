@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FOT-M MES SİSTEMİ</title>
+    <title>FOT-M İMALAT YÜRÜTME SİSTEMLERİ</title>
     <link rel="icon" href="uretimingelecegilogosiyaharkaplansiz.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -93,7 +93,7 @@
             filter: brightness(0.9); 
         }
 
-        /* HEADER TASARIMI */
+        /* HEADER TASARIMI (3 BÖLÜMLÜ DÜZEN) */
         header { 
             background-color: var(--card-bg); 
             padding: 10px 20px; 
@@ -105,15 +105,29 @@
             position: sticky; 
             top: 0; 
             z-index: 1000; 
-            flex-wrap: wrap; 
-            gap: 10px; 
         }
 
         .header-left { 
             display: flex; 
             align-items: center; 
             gap: 15px; 
-            flex-wrap: wrap; 
+            flex: 1;
+        }
+
+        .header-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex: 1.5;
+        }
+
+        .header-right { 
+            display: flex; 
+            align-items: center; 
+            justify-content: flex-end;
+            gap: 15px; 
+            flex: 1;
         }
 
         .logo { 
@@ -124,18 +138,13 @@
 
         .clock-box { 
             font-size: 1.4em; 
-            font-weight: 700; 
-            background: #f0f0f0; 
-            padding: 5px 15px; 
-            border-radius: 6px; 
-            border: 2px solid var(--border); 
+            font-weight: 900; 
+            background: #ffffff; 
+            padding: 6px 18px; 
+            border-radius: 8px; 
+            border: 3px solid var(--border); 
             font-family: monospace; 
-        }
-
-        .header-right { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
+            letter-spacing: 1px;
         }
 
         .operator-photo { 
@@ -492,12 +501,11 @@
                 align-items: flex-start; 
                 padding: 10px; 
             }
-            .header-left, .header-right { 
+            .header-left, .header-center, .header-right { 
                 width: 100%; 
-                justify-content: space-between; 
+                justify-content: flex-start; 
                 margin-top: 10px; 
             }
-            .header-slogan { display: none; }
             .dashboard-grid { grid-template-columns: 1fr !important; }
             .chart-wrapper { height: 300px; }
             .modal-box { padding: 15px; width: 90vw; }
@@ -521,19 +529,19 @@
     <div id="main-dashboard" style="display:none;">
         <header>
             <div class="header-left">
-                <img src="download.png" class="logo" title="SUBÜ" alt="SUBU">
+                <img src="download.png" class="logo" title="SUBÜ" alt="SUBU" style="height: 55px;">
                 <div class="clock-box" id="live-clock">00:00:00</div>
-                <img src="FOTM.jpg" class="logo" title="FOT-M" alt="FOT-M" style="border-radius: 50%;">
-                
-                <div style="display: flex; align-items: center; gap: 8px;" class="header-slogan">
-                    <img src="uretimingelecegilogobeyaz.png" class="logo" style="height: 45px;" alt="Slogan">
-                    <span style="font-weight: 900; font-size: 0.8em; line-height: 1.2;">ÜRETİMİN GELECEĞİ<br><small style="color:#555;">BİZİM ELİMİZDE</small></span>
-                </div>
+            </div>
+            
+            <div class="header-center">
+                <img src="FOTM.jpg" class="logo" title="FOT-M" alt="FOT-M" style="height: 60px; object-fit: contain;">
+                <img src="uretimingelecegilogobeyaz.png" class="logo" style="height: 55px; object-fit: contain;" alt="Slogan Logo">
+                <span style="font-weight: 900; font-size: 0.85em; line-height: 1.2; text-align: left; margin-left: 5px;">ÜRETİMİN GELECEĞİ<br><small style="color:#555;">BİZİM ELİMİZDE</small></span>
             </div>
 
             <div class="header-right">
-                <div style="text-align: right; margin-left: 10px;">
-                    <p id="op-name" style="font-weight:900; font-size: 1.1em;"></p>
+                <div style="text-align: right; margin-right: 10px;">
+                    <p id="op-name" style="font-weight:900; font-size: 1.1em;">Kariyer</p>
                     <p style="font-size: 0.75em; color: var(--success); font-weight: bold;">● SİSTEM AKTİF</p>
                 </div>
                 <img src="default.png" id="op-img" class="operator-photo" alt="Operator">
@@ -568,7 +576,7 @@
                     <div id="status-card" class="card" style="grid-column: 1/-1; border-left-color:var(--success); text-align:center;">
                         <h1 style="color:var(--success); font-size:3em; font-weight:900;">ÜRETİM AKTİF</h1>
                         <p style="font-weight:bold;">Sistem senkronize çalışıyor.</p>
-                        <button onclick="openHistory()" style="margin-top:15px; background:var(--primary-gray); color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer;">VARDIYA GEÇMIŞI GÖRÜNTÜLE</button>
+                        <button onclick="openHistory()" style="margin-top:15px; background:var(--primary-gray); color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer;">VARDIYA GEÇMİŞİ GÖRÜNTÜLE</button>
                     </div>
                     <div class="card">
                         <h3>TOPLAM ÜRETİM</h3>
@@ -891,32 +899,35 @@
                 <h2 id="m-uptime" style="color:#10b981; font-size:1.5em; line-height:1.3;">0s 0d</h2>
             </div>
         </div>
-        <button class="login-btn" style="width:100%; margin-top:25px; background:var(--border);" onclick="closeAllModals()">⬅ GERİ DÖN</button>
+        <button class="login-btn" style="width:100%; margin-top:25px; background:var(--border);" onclick="closeM()">⬅ GERİ DÖN</button>
     </div>
 
     <script>
-        // TEMEL AYARLAR
-        let updateSpeed = 10000; // Sayacın atma hızı (10 saniye - Gerçekçi fabrika hızı)
+        // ÜRETİM VE SAYAC AYARLARI
+        let updateSpeed = 6000; // 6 saniyede bir parça üretimi
         let running = true;
         let notifCount = 0;
+        
+        // OEE DURUŞ SAYACLARI
         let historicalPlannedSeconds = 3600; 
         let historicalUnplannedSeconds = 1200; 
         let livePlannedSeconds = 0;
         let liveUnplannedSeconds = 0;
+        
+        let dtType = "";
         let dtStart = null;
         let dtInt = null;
-        let dtType = "";
         let selSt = "";
-        let eChart, pChart, ws = null;
-        let editingWoId = null;
         let simStartTime = Date.now();
+        let editingWoId = null;
+        let eChart, pChart, ws = null;
         let simInterval = null;
 
-        // KALICI VERİ (LOCALSTORAGE)
+        // LOCALSTORAGE KALICI VERİ
         let pCount = parseInt(localStorage.getItem('fotm_pCount')) || 1420;
         let dCount = parseInt(localStorage.getItem('fotm_dCount')) || 11;
 
-        // İŞ EMİRLERİ LİSTESİ
+        // VERİ TABANLARI (DİZİLER)
         let workOrders = [
             {id: 7822, code: 'P-101', name: 'PLC KONTROL KARTI', client: '-', priority: 'ACİL', status: 'AKTİF ÜRETİM', time: '08:00', endTime: '-', target: 2500, produced: 1420, defect: 11, op: 'Muhammed Arda Sarı', cycle: '1.2'},
             {id: 7824, code: 'S-440', name: 'PNÖMATİK VALF', client: '-', priority: 'ACİL', status: 'BEKLEYEN', time: '13:00', endTime: '-', target: 150, produced: 0, defect: 0, op: 'Muhammed Arda Sarı', cycle: '1.8'},
@@ -929,7 +940,6 @@
             {id: 7815, code: 'H-902', name: 'HİDROLİK POMPA GÖVDESİ', client: '-', priority: 'NORMAL', status: 'TAMAMLANDI', time: '22:00', endTime: '03:45', target: 500, produced: 500, defect: 3, op: 'Efe Şen', cycle: '3.0'}
         ];
         
-        // MAKİNELER LİSTESİ
         let machines = [
             {id:'M1', n:'Pres 1', o:88, p:42, t: 65, prod: 1520, def: 12, uptime: '6s 45d'},
             {id:'M2', n:'Montaj A', o:92, p:12, t: 40, prod: 2100, def: 5, uptime: '7s 10d'},
@@ -948,13 +958,15 @@
             {id:'M15', n:'Fırın 2', o:75, p:235, t: 185, prod: 580, def: 30, uptime: '4s 30d'}
         ];
 
-        // GİRİŞ VE BYPASS SİSTEMİ (Render Uyku Modu Korumalı)
+        // GİRİŞ FONKSİYONU (İSTENİLEN BİREBİR KOD + BINDING)
         async function login() {
             const u = $('#username').val().toLowerCase().trim();
             const p = $('#password').val().trim();
 
             if (!u || !p) {
-                $('#login-error').text('Kullanıcı adı ve şifre giriniz!').show();
+                $('#login-error')
+                    .text('Kullanıcı adı ve şifre giriniz!')
+                    .show();
                 return;
             }
 
@@ -1008,6 +1020,7 @@
             }
         }
 
+        // SİSTEM GÜNLÜĞÜ BİLDİRİM FONKSİYONU
         function addLog(message, color = "black") {
             const log = `
                 <div style="padding:6px 0; color:${color}; font-weight:bold;">
@@ -1033,14 +1046,19 @@
             $('.tab-btn').removeClass('active'); 
             $('#'+id).show(); 
             if(e) $(e.currentTarget).addClass('active'); 
-            if(id === 't4') { 
-                updateEnergyChart(); 
-            }
+            if(id === 't4') { updateEnergyChart(); }
         }
 
-        // MODAL KAPATICI
+        // MODAL KAPATMA
         function closeAllModals() {
             $('.overlay, .modal-box').fadeOut();
+        }
+
+        function clearNotifs() {
+            notifCount = 0; 
+            $('#notif-count').text("0"); 
+            $('#notif-list').empty(); 
+            $('#notif-panel').fadeOut();
         }
 
         // İŞ EMRİ FONKSİYONLARI
@@ -1205,6 +1223,7 @@
                 let s = Math.floor((Date.now()-dtStart)/1000); 
                 $('#dt-timer').text(new Date(s*1000).toISOString().substr(11,8)); 
                 
+                // İstenilen kod bug fix
                 if (dtType === "Plansız") {
                     liveUnplannedSeconds += 1; 
                 } else {
@@ -1228,11 +1247,11 @@
             updateOeeDisplay();
         }
 
+        // İSTENİLEN OEE HESAPLAMA BUG FIX
         function calculateOEE() {
             let totalShiftTime = 28800; 
             
-            // OEE BUG FIX UYGULANDI
-            let unplannedLoss = historicalUnplannedSeconds + liveUnplannedSeconds; 
+            let unplannedLoss = historicalUnplannedSeconds + liveUnplannedSeconds;
             
             let availability = (totalShiftTime - unplannedLoss) / totalShiftTime;
             
@@ -1340,11 +1359,12 @@
             });
         }
 
-        // GEÇMİŞ VARDİYA MODAL
+        // GEÇMİŞ VARDİYA (YENİ ÖZELLİK)
         function openHistory() {
             $('#global-overlay, #history-modal').fadeIn();
         }
 
+        // İSTASYON MODAL
         function openM(id) { 
             const m = machines.find(x => x.id === id); 
             $('#modal-name').text(m.n + " İstasyon Analizi"); 
@@ -1518,7 +1538,7 @@
                 // Fabrika standardında parça artış hızı
                 pCount += 1; 
                 
-                // LocalStorage'a kaydet (PERSISTENCE)
+                // LocalStorage'a kaydet (PERSISTENCE KALICI VERİ)
                 localStorage.setItem('fotm_pCount', pCount);
                 
                 let activeWO = workOrders.find(wo => wo.status === 'AKTİF ÜRETİM');
@@ -1608,7 +1628,7 @@
             listCams(); 
         }
 
-        // GLOBAL SCOPE ATAMALARI (Tıklama ve Event Hatalarını Önler)
+        // GLOBAL SCOPE ATAMALARI (Zirvede Buton Tıklama ve Event Hatalarını Tamamen Önler)
         window.tab = tab;
         window.editWO = editWO;
         window.completeWO = completeWO;
@@ -1630,6 +1650,7 @@
         window.startCam = startCam;
         window.stopCam = stopCam;
         window.login = login;
+        window.clearNotifs = clearNotifs;
 
         $(document).ready(function() {
             setInterval(() => { $('#live-clock').text(new Date().toLocaleTimeString()); }, 1000);
