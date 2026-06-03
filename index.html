@@ -493,7 +493,7 @@
     <div id="login-modal">
         <div class="login-box">
             <img src="FOTM.jpg" class="login-logo" alt="Logo">
-            <h1 style="margin-bottom:20px; font-weight:900; font-size:1.8em; color:var(--primary-gray);">FOT-M İMALAT YÜRÜTME SİSTEMİ</h1>
+            <h1 style="margin-bottom:20px; font-weight:900; font-size:1.8em; color:var(--primary-gray);">FOT-M MES SİSTEMİ</h1>
             <input type="text" id="username" class="login-input" placeholder="Kullanıcı Adı">
             <input type="password" id="password" class="login-input" placeholder="Şifre">
             <button class="login-btn" onclick="login()">SİSTEME GİRİŞ YAP</button>
@@ -838,10 +838,10 @@
     </div>
 
     <script>
-        // CRITICAL VERCEL SETTING: Vercel'deki yeni Python backend adresinizi buraya yapıştırın
-        const BACKEND_URL = "https://yeni-arka-yuz-adresiniz.vercel.app";
+        // BACKEND URL TANIMLAMASI
+        const BACKEND_URL = "https://fotm-backend.vercel.app";
 
-        let updateSpeed = 6000; // 6 saniyede bir yerel üretim tetikleme
+        let updateSpeed = 6000; 
         let running = true;
         let notifCount = 0;
         
@@ -906,7 +906,7 @@
 
             try {
                 const controller = new AbortController();
-                setTimeout(() => controller.abort(), 8000); // Serverless hızlı dönmelidir
+                setTimeout(() => controller.abort(), 8000); 
 
                 const res = await fetch(`${BACKEND_URL}/api/login`, {
                     method: 'POST',
@@ -927,13 +927,12 @@
                 init();
 
             } catch (e) {
-                console.log("Serverless uyanma gecikmesi veya bağlantı hatası, yerel simülasyon modu devrede:", e);
-                // Sunucu kapalı veya uykuda olsa bile sistemin açılması sağlandı
+                console.log("Serverless uyanma veya haberleşme sorunu, yerel moda geçiliyor:", e);
                 $('#login-modal').fadeOut();
                 $('#main-dashboard').fadeIn();
                 $('#op-name').text("Muhammed Arda Sarı");
                 init();
-                addLog("Sunucu uykuda veya bağlantı yok. Kesintisiz yerel mod aktif.", "orange");
+                addLog("Sunucu bağlantısı doğrulanamadı. Kesintisiz yerel mod aktif.", "orange");
             }
         }
 
@@ -1272,7 +1271,7 @@
             a.href = URL.createObjectURL(b); a.download = `MES_Rapor_${new Date().toISOString().split('T')[0]}.csv`; a.click(); 
         }
 
-        // KESİNTİSİZ LOCAL KPI SAYICI DÖNGÜSÜ (SERVERLESS SİSTEMİN KALBİ)
+        // KESİNTİSİZ LOCAL KPI SAYICI DÖNGÜSÜ
         function startCounterLoop() {
             if(simInterval) clearInterval(simInterval);
             simInterval = setInterval(() => { 
@@ -1327,7 +1326,6 @@
 
             updateEnergyChart(); updateOeeDisplay(); renderWorkOrders();
 
-            // İstasyonların durumunu düzenli güncelleyen arka plan periyodu
             setInterval(() => {
                 if(!running) return;
                 machines.forEach(m => {
@@ -1351,6 +1349,13 @@
         window.login = login; window.clearNotifs = clearNotifs;
 
         $(document).ready(function() {
+            // Şifre ekranında Enter tuşu dinlemesi aktif edildi
+            $('#username, #password').keypress(function(e) {
+                if(e.which == 13) {
+                    login();
+                }
+            });
+
             setInterval(() => { $('#live-clock').text(new Date().toLocaleTimeString()); }, 1000);
             const mFilter = $('#machine-filter');
             const dtList = $('#dt-st-list');
