@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FOT-M MES SİSTEMi</title>
+    <title>FOT-M İMALAT YÜRÜTME SİSTEMİ</title>
     <link rel="icon" href="uretimingelecegilogosiyaharkaplansiz.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -93,7 +93,7 @@
             filter: brightness(0.9); 
         }
 
-        /* HEADER TASARIMI (3 BÖLÜMLÜ DÜZEN) */
+        /* HEADER TASARIMI */
         header { 
             background-color: var(--card-bg); 
             padding: 10px 20px; 
@@ -228,7 +228,7 @@
             font-weight: 700; 
         }
 
-        /* SEKME (MENÜ) YAPISI */
+        /* NAVİGASYON SEKME YAPISI */
         .mes-nav { 
             display: flex; 
             background-color: #e0e0e0; 
@@ -348,27 +348,6 @@
             filter: brightness(0.85);
         }
 
-        /* AI KAMERA */
-        .video-box { 
-            width: 100%; 
-            height: 450px; 
-            background: #000; 
-            border-radius: 10px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: white; 
-            position: relative; 
-            overflow: hidden; 
-        }
-
-        #webcam-video { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            display: none; 
-        }
-
         /* MODAL YAPILARI */
         .modal-box { 
             display: none; 
@@ -386,10 +365,6 @@
             box-shadow: 0 0 150px rgba(0,0,0,0.8); 
             max-height: 90vh; 
             overflow-y: auto; 
-        }
-
-        #wo-modal, #wo-details-modal, #history-modal, #m-modal { 
-            max-width: 750px; 
         }
 
         .overlay { 
@@ -413,7 +388,7 @@
             font-size: 1em; 
         }
 
-        /* DURUŞ VE İSTASYON YÖNETİMİ ÖZEL TASARIM */
+        /* DURUŞ YÖNETİMİ */
         .st-card { 
             padding: 15px; 
             background: #f8f8f8; 
@@ -450,7 +425,6 @@
             gap: 15px; 
         }
 
-        /* MODERN İSTASYON SEÇİM BUTONLARI */
         .st-select-btn { 
             background: #ffffff; 
             color: #000000; 
@@ -519,7 +493,7 @@
     <div id="login-modal">
         <div class="login-box">
             <img src="FOTM.jpg" class="login-logo" alt="Logo">
-            <h1 style="margin-bottom:20px; font-weight:900; font-size:1.8em; color:var(--primary-gray);">FOT-M MES SİSTEMİ</h1>
+            <h1 style="margin-bottom:20px; font-weight:900; font-size:1.8em; color:var(--primary-gray);">FOT-M İMALAT YÜRÜTME SİSTEMİ</h1>
             <input type="text" id="username" class="login-input" placeholder="Kullanıcı Adı">
             <input type="password" id="password" class="login-input" placeholder="Şifre">
             <button class="login-btn" onclick="login()">SİSTEME GİRİŞ YAP</button>
@@ -568,7 +542,6 @@
             <button class="tab-btn" onclick="tab(event, 't3')">DURUŞ YÖNETİMİ</button>
             <button class="tab-btn" onclick="tab(event, 't-maint')">BAKIM YÖNETİMİ</button>
             <button class="tab-btn" onclick="tab(event, 't4')">ENERJİ TÜKETİMİ</button>
-            <button class="tab-btn" onclick="tab(event, 't5')">AI KAMERA</button>
         </nav>
 
         <main>
@@ -752,21 +725,6 @@
                     </div>
                 </div>
             </div>
-
-            <div id="t5" class="tab-content" style="display:none;">
-                <div class="card">
-                    <h3>AI KALİTE DENETİMİ (KAMERA BAĞLANTISI)</h3>
-                    <div style="margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap;">
-                        <select id="cam-sel" style="flex:1; padding:15px; border:2px solid var(--border); font-weight:bold; border-radius:6px; min-width:200px;"></select>
-                        <button onclick="startCam()" style="background:var(--success); color:white; padding:15px 30px; border:none; border-radius:6px; font-weight:900; cursor:pointer; flex:1;">KAMERAYI AÇ</button>
-                        <button onclick="stopCam()" style="background:var(--danger); color:white; padding:15px 30px; border:none; border-radius:6px; font-weight:900; cursor:pointer; flex:1;">KAMERAYI KAPAT</button>
-                    </div>
-                    <div class="video-box" id="v-box">
-                        <span id="cam-text">GÖRÜNTÜ BEKLENİYOR...</span>
-                        <video id="webcam-video" autoplay playsinline muted></video>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
 
@@ -880,12 +838,13 @@
     </div>
 
     <script>
-        // ÜRETİM VE SAYAC AYARLARI
-        let updateSpeed = 6000; // 6 saniyede bir parça üretimi
+        // CRITICAL VERCEL SETTING: Vercel'deki yeni Python backend adresinizi buraya yapıştırın
+        const BACKEND_URL = "https://yeni-arka-yuz-adresiniz.vercel.app";
+
+        let updateSpeed = 6000; // 6 saniyede bir yerel üretim tetikleme
         let running = true;
         let notifCount = 0;
         
-        // OEE DURUŞ SAYACLARI
         let historicalPlannedSeconds = 3600; 
         let historicalUnplannedSeconds = 1200; 
         let livePlannedSeconds = 0;
@@ -897,14 +856,12 @@
         let selSt = "";
         let simStartTime = Date.now();
         let editingWoId = null;
-        let eChart, pChart, ws = null;
+        let eChart, pChart;
         let simInterval = null;
 
-        // LOCALSTORAGE KALICI VERİ
         let pCount = parseInt(localStorage.getItem('fotm_pCount')) || 1420;
         let dCount = parseInt(localStorage.getItem('fotm_dCount')) || 11;
 
-        // VERİ TABANLARI (DİZİLER)
         let workOrders = [
             {id: 7822, code: 'P-101', name: 'PLC KONTROL KARTI', client: '-', priority: 'ACİL', status: 'AKTİF ÜRETİM', time: '08:00', endTime: '-', target: 2500, produced: 1420, defect: 11, op: 'Muhammed Arda Sarı', cycle: '1.2'},
             {id: 7824, code: 'S-440', name: 'PNÖMATİK VALF', client: '-', priority: 'ACİL', status: 'BEKLEYEN', time: '13:00', endTime: '-', target: 150, produced: 0, defect: 0, op: 'Emirhan Şenel', cycle: '1.8'},
@@ -935,15 +892,13 @@
             {id:'M15', n:'Fırın 2', o:75, p:235, t: 185, prod: 580, def: 30, uptime: '4s 30d'}
         ];
 
-        // GİRİŞ FONKSİYONU (İSTENİLEN BİREBİR KOD + BINDING)
+        // HTTP SERVERLESS LOGIN
         async function login() {
             const u = $('#username').val().toLowerCase().trim();
             const p = $('#password').val().trim();
 
             if (!u || !p) {
-                $('#login-error')
-                    .text('Kullanıcı adı ve şifre giriniz!')
-                    .show();
+                $('#login-error').text('Kullanıcı adı ve şifre giriniz!').show();
                 return;
             }
 
@@ -951,73 +906,45 @@
 
             try {
                 const controller = new AbortController();
-                setTimeout(() => controller.abort(), 15000);
+                setTimeout(() => controller.abort(), 8000); // Serverless hızlı dönmelidir
 
-                const res = await fetch('https://meskariyergunu.onrender.com/api/login', {
+                const res = await fetch(`${BACKEND_URL}/api/login`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username: u,
-                        password: p
-                    }),
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p }),
                     signal: controller.signal
                 });
 
-                if (!res.ok) {
-                    throw new Error("Sunucu yanıt vermedi");
-                }
+                if (!res.ok) throw new Error("Doğrulama hatası");
 
                 const data = await res.json();
 
                 $('#login-modal').fadeOut();
                 $('#main-dashboard').fadeIn();
-
                 $('#op-name').text(data.name || "Muhammed Arda Sarı");
 
-                if (data.photo) {
-                    $('#op-img').attr('src', data.photo);
-                }
-
+                if (data.photo) $('#op-img').attr('src', data.photo);
                 init();
 
             } catch (e) {
-                console.log("Render bağlantı hatası:", e);
-
-                // Sunucu kapalıysa bile sistem açılsın
+                console.log("Serverless uyanma gecikmesi veya bağlantı hatası, yerel simülasyon modu devrede:", e);
+                // Sunucu kapalı veya uykuda olsa bile sistemin açılması sağlandı
                 $('#login-modal').fadeOut();
                 $('#main-dashboard').fadeIn();
-
                 $('#op-name').text("Muhammed Arda Sarı");
-
                 init();
-
-                addLog("Sunucu bağlantısı yok. Yerel simülasyon modu aktif.", "orange");
+                addLog("Sunucu uykuda veya bağlantı yok. Kesintisiz yerel mod aktif.", "orange");
             }
         }
 
-        // SİSTEM GÜNLÜĞÜ BİLDİRİM FONKSİYONU
         function addLog(message, color = "black") {
-            const log = `
-                <div style="padding:6px 0; color:${color}; font-weight:bold;">
-                    [${new Date().toLocaleTimeString()}] ${message}
-                </div>
-            `;
-
+            const log = `<div style="padding:6px 0; color:${color}; font-weight:bold;">[${new Date().toLocaleTimeString()}] ${message}</div>`;
             $('#log-list').prepend(log);
-
             notifCount++;
             $('#notif-count').text(notifCount);
-
-            $('#notif-list').prepend(`
-                <div class="notif-item">
-                    ${message}
-                </div>
-            `);
+            $('#notif-list').prepend(`<div class="notif-item">${message}</div>`);
         }
 
-        // MENÜ GEÇİŞ FONKSİYONU
         function tab(e, id) { 
             $('.tab-content').hide(); 
             $('.tab-btn').removeClass('active'); 
@@ -1026,7 +953,6 @@
             if(id === 't4') { updateEnergyChart(); }
         }
 
-        // MODAL KAPATMA
         function closeAllModals() {
             $('.overlay, .modal-box').fadeOut();
         }
@@ -1038,7 +964,6 @@
             $('#notif-panel').fadeOut();
         }
 
-        // İŞ EMRİ FONKSİYONLARI
         function openWoModal() {
             editingWoId = null;
             $('#wo-modal-title').text('YENİ İŞ EMRİ OLUŞTUR');
@@ -1124,33 +1049,16 @@
             if(editingWoId !== null) {
                 let wo = workOrders.find(x => x.id === editingWoId);
                 if(wo) {
-                    wo.code = code;
-                    wo.name = name;
-                    wo.client = client;
-                    wo.op = op;
-                    wo.target = target;
-                    wo.priority = priority;
-                    wo.status = status;
-                    wo.cycle = cycle;
+                    wo.code = code; wo.name = name; wo.client = client; wo.op = op;
+                    wo.target = target; wo.priority = priority; wo.status = status; wo.cycle = cycle;
                     addLog("İş Emri Güncellendi: #" + wo.id, "blue");
                 }
             } else {
                 const randId = Math.floor(Math.random() * 9000) + 1000; 
                 const time = new Date().toLocaleTimeString().substr(0,5);
                 const newWo = {
-                    id: randId, 
-                    code: code, 
-                    name: name, 
-                    client: client, 
-                    priority: priority,
-                    status: status, 
-                    time: time, 
-                    endTime: '-', 
-                    target: target, 
-                    produced: 0, 
-                    defect: 0, 
-                    op: op, 
-                    cycle: cycle
+                    id: randId, code: code, name: name, client: client, priority: priority,
+                    status: status, time: time, endTime: '-', target: target, produced: 0, defect: 0, op: op, cycle: cycle
                 };
                 if(priority === 'ACİL') { workOrders.unshift(newWo); } else { workOrders.push(newWo); }
                 addLog("Yeni İş Emri Eklendi: #" + randId + " - " + name, "green");
@@ -1160,7 +1068,6 @@
             renderWorkOrders();
         }
 
-        // DURUŞ YÖNETİMİ
         function goDtStep2(n) { 
             selSt = n; 
             $('#dt-sel-st').text(n); 
@@ -1176,12 +1083,7 @@
             const r = t === 'Planlı' ? ['Mola', 'Vardiya Değişimi', 'Planlı Bakım', 'Bayram Tatili'] : ['Arıza', 'Kalite Sorunu', 'Hammadde Bekleme'];
             
             r.forEach(x => { 
-                $('<button>')
-                    .addClass('dt-btn')
-                    .css('background', t === 'Planlı' ? '#d97706' : '#df2311')
-                    .text(x)
-                    .click(() => startDt(x))
-                    .appendTo(div); 
+                $('<button>').addClass('dt-btn').css('background', t === 'Planlı' ? '#d97706' : '#df2311').text(x).click(() => startDt(x)).appendTo(div); 
             });
         }
         
@@ -1199,13 +1101,7 @@
             dtInt = setInterval(() => { 
                 let s = Math.floor((Date.now()-dtStart)/1000); 
                 $('#dt-timer').text(new Date(s*1000).toISOString().substr(11,8)); 
-                
-                // İstenilen kod bug fix
-                if (dtType === "Plansız") {
-                    liveUnplannedSeconds += 1; 
-                } else {
-                    livePlannedSeconds += 1; 
-                }
+                if (dtType === "Plansız") { liveUnplannedSeconds += 1; } else { livePlannedSeconds += 1; }
                 updateOeeDisplay();
             }, 1000); 
         }
@@ -1213,8 +1109,7 @@
         function stopDt() { 
             running = true; 
             clearInterval(dtInt); 
-            dtStart = null;
-            dtType = "";
+            dtStart = null; dtType = "";
             $('#ds4').removeClass('active'); 
             $('#ds1').addClass('active'); 
             
@@ -1224,27 +1119,21 @@
             updateOeeDisplay();
         }
 
-        // İSTENİLEN OEE HESAPLAMA BUG FIX
         function calculateOEE() {
             let totalShiftTime = 28800; 
-            
             let unplannedLoss = historicalUnplannedSeconds + liveUnplannedSeconds;
-            
             let availability = (totalShiftTime - unplannedLoss) / totalShiftTime;
-            
             if (availability > 1) availability = 1;
             if (availability < 0.6) availability = 0.6;
             
             let quality = pCount > 0 ? ((pCount - dCount) / pCount) : 0.995;
             let performance = 0.992;
-            
             return (availability * performance * quality * 100).toFixed(1);
         }
 
         function updateOeeDisplay() {
             let oee = calculateOEE();
             $('#kpi-o').text('%' + oee);
-            
             const mBody = $('#m-table-body').empty();
             
             machines.forEach((m, idx) => {
@@ -1288,195 +1177,78 @@
 
             workOrders.forEach(wo => {
                 let prioHtml = wo.priority === 'ACİL' ? `<span style="color:red; font-weight:bold;">ACİL</span>` : `NORMAL`;
-                let statusColor = 'orange';
-                if(wo.status === 'AKTİF ÜRETİM') statusColor = 'green';
-                if(wo.status === 'TAMAMLANDI') statusColor = '#555';
+                let statusColor = wo.status === 'AKTİF ÜRETİM' ? 'green' : (wo.status === 'TAMAMLANDI' ? '#555' : 'orange');
                 let statusHtml = `<span style="color:${statusColor}; font-weight:bold;">${wo.status}</span>`;
-                
                 let qualityPercent = wo.produced > 0 ? (((wo.produced - wo.defect) / wo.produced) * 100).toFixed(1) : '100.0';
 
                 if(wo.status === 'TAMAMLANDI') {
-                    const row = `<tr>
-                        <td>#${wo.id}</td>
-                        <td>${wo.name} (${wo.code})</td>
-                        <td>-</td>
-                        <td>${prioHtml}</td>
-                        <td>${statusHtml}</td>
-                        <td>${wo.time}</td>
-                        <td>${wo.endTime}</td>
-                        <td>${wo.target}</td>
-                        <td>${wo.produced}</td>
-                        <td style="color:var(--danger);">${wo.defect}</td>
+                    completedBody.append(`<tr>
+                        <td>#${wo.id}</td><td>${wo.name} (${wo.code})</td><td>-</td><td>${prioHtml}</td><td>${statusHtml}</td>
+                        <td>${wo.time}</td><td>${wo.endTime}</td><td>${wo.target}</td><td>${wo.produced}</td><td style="color:var(--danger);">${wo.defect}</td>
                         <td>
                             <button class="action-btn" onclick="viewWoDetails(${wo.id})">Detay</button>
                             <button class="del-btn" onclick="deleteWO(${wo.id})">Sil</button>
                         </td>
-                    </tr>`;
-                    completedBody.append(row);
+                    </tr>`);
                 } else {
                     let completeBtn = wo.status === 'AKTİF ÜRETİM' ? `<button class="action-btn" onclick="completeWO(${wo.id})">Bitir</button>` : '';
-                    const row = `<tr>
-                        <td>#${wo.id}</td>
-                        <td>${wo.name} (${wo.code})</td>
-                        <td>-</td>
-                        <td>${prioHtml}</td>
-                        <td>${statusHtml}</td>
-                        <td>${wo.target}</td>
-                        <td style="font-weight:900; color:var(--danger);">${wo.produced}</td>
-                        <td>%${qualityPercent}</td>
+                    activeBody.append(`<tr>
+                        <td>#${wo.id}</td><td>${wo.name} (${wo.code})</td><td>-</td><td>${prioHtml}</td><td>${statusHtml}</td><td>${wo.target}</td>
+                        <td style="font-weight:900; color:var(--danger);">${wo.produced}</td><td>%${qualityPercent}</td>
                         <td>
                             <button class="action-btn" onclick="viewWoDetails(${wo.id})">Detay</button>
                             <button class="action-btn" onclick="editWO(${wo.id})">Düzenle</button>
                             ${completeBtn}
                             <button class="del-btn" onclick="deleteWO(${wo.id})">Sil</button>
                         </td>
-                    </tr>`;
-                    activeBody.append(row);
+                    </tr>`);
                 }
             });
         }
 
-        // GEÇMİŞ VARDİYA (YENİ ÖZELLİK)
-        function openHistory() {
-            $('#global-overlay, #history-modal').fadeIn();
-        }
-
-        // İSTASYON MODAL
         function openM(id) { 
             const m = machines.find(x => x.id === id); 
             $('#modal-name').text(m.n + " İstasyon Analizi"); 
             $('#m-oee').text('%' + m.o); 
             $('#m-p').html(`${m.p} <small style="font-size:0.4em; color:#333;">kW/h</small>`); 
             $('#m-t').html(`${m.t} <small style="font-size:0.4em; color:#333;">°C</small>`);
-            $('#m-prod').text(m.prod); 
-            $('#m-def').text(m.def); 
-            $('#m-uptime').text(m.uptime);
+            $('#m-prod').text(m.prod); $('#m-def').text(m.def); $('#m-uptime').text(m.uptime);
             $('#global-overlay, #m-modal').fadeIn(); 
         }
 
-        function closeM() { 
-            $('#m-modal, #global-overlay').fadeOut(); 
-        }
+        function closeM() { $('#m-modal, #global-overlay').fadeOut(); }
 
-        // AI KAMERA
-        async function listCams() { 
-            try {
-                const devs = await navigator.mediaDevices.enumerateDevices(); 
-                const sel = $('#cam-sel').empty(); 
-                let hasVideo = false;
-                devs.filter(d => d.kind === 'videoinput').forEach((c, i) => { 
-                    $('<option>').val(c.deviceId).text(c.label || `Kamera ${i+1}`).appendTo(sel); 
-                    hasVideo = true;
-                });
-                if(!hasVideo) $('<option>').text("Kamera bulunamadı!").appendTo(sel);
-            } catch(e) { 
-                console.log("Kamera izni yok."); 
-            }
-        }
-
-        async function startCam() { 
-            try {
-                let id = $('#cam-sel').val();
-                let constraints = { video: { playsinline: true, width: { ideal: 1024 }, height: { ideal: 768 } } };
-                
-                if(id && id !== "Kamera bulunamadı!" && id !== "") {
-                    constraints.video.deviceId = { exact: id };
-                } else {
-                    constraints.video.facingMode = "environment";
-                }
-                
-                const s = await navigator.mediaDevices.getUserMedia(constraints); 
-                const v = document.getElementById('webcam-video'); 
-                v.srcObject = s; 
-                v.style.display = 'block'; 
-                $('#cam-text').hide(); 
-            } catch(e) { 
-                console.log("Kamera hatası, tablet/mobil fallback devrede:", e);
-                try {
-                    const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                    const v = document.getElementById('webcam-video'); 
-                    v.srcObject = s; 
-                    v.style.display = 'block'; 
-                    $('#cam-text').hide();
-                } catch(err) {
-                    try {
-                        const s = await navigator.mediaDevices.getUserMedia({ video: true });
-                        const v = document.getElementById('webcam-video'); 
-                        v.srcObject = s; 
-                        v.style.display = 'block'; 
-                        $('#cam-text').hide();
-                    } catch(lastErr) {
-                        alert("Kamera bağlantısı sağlanamadı! Lütfen tarayıcı ayarlarından kamera iznini onaylayın."); 
-                    }
-                }
-            }
-        }
-
-        function stopCam() {
-            const v = document.getElementById('webcam-video');
-            if(v.srcObject) { 
-                v.srcObject.getTracks().forEach(track => track.stop()); 
-                v.srcObject = null; 
-            }
-            v.style.display = 'none'; 
-            $('#cam-text').show();
-        }
-
-        // ENERJİ GRAFİKLERİ
         function toggleChartType() {
             const type = $('#chart-type-selector').val();
-            if(type === 'bar') {
-                $('#pie-wrapper').hide(); 
-                $('#bar-wrapper').fadeIn();
-            } else {
-                $('#bar-wrapper').hide(); 
-                $('#pie-wrapper').fadeIn();
-            }
+            if(type === 'bar') { $('#pie-wrapper').hide(); $('#bar-wrapper').fadeIn(); } 
+            else { $('#bar-wrapper').hide(); $('#pie-wrapper').fadeIn(); }
             updateEnergyChart(); 
         }
 
         function updateEnergyChart() {
             let val = $('#range').val(), mFilter = $('#machine-filter').val();
             let timeMultiplier = val === '1' ? 1 : (val === '3' ? 3 : (val === '6' ? 6 : 12));
-            
-            let count = 0, labelPrefix = "";
-            if(val === '1') { count = 30; labelPrefix = "Gün"; }
-            else if(val === '3') { count = 12; labelPrefix = "Hafta"; }
-            else if(val === '6') { count = 24; labelPrefix = "Hafta"; }
-            else { count = 12; labelPrefix = "Ay"; }
+            let count = val === '1' ? 30 : (val === '3' ? 12 : (val === '6' ? 24 : 12));
+            let labelPrefix = val === '1' ? "Gün" : (val === '3' ? "Hafta" : (val === '6' ? "Hafta" : "Ay"));
 
-            let labels = [], data = [], baseP = 0;
-            if(mFilter === 'all') { 
-                baseP = machines.reduce((sum, m) => sum + m.p, 0); 
-            } else { 
-                baseP = machines.find(m => m.id === mFilter).p; 
-            }
+            let labels = [], data = [], baseP = mFilter === 'all' ? machines.reduce((sum, m) => sum + m.p, 0) : machines.find(m => m.id === mFilter).p;
 
             for(let i = 1; i <= count; i++) {
                 labels.push(`${i}. ${labelPrefix}`);
                 data.push(Math.floor(baseP * (0.8 + Math.random() * 0.4)) * (val==='1'?1:7)); 
             }
-            eChart.data.labels = labels; 
-            eChart.data.datasets[0].data = data;
+            eChart.data.labels = labels; eChart.data.datasets[0].data = data;
             eChart.data.datasets[0].label = mFilter === 'all' ? 'Tüketim (kW/h)' : `${machines.find(m=>m.id===mFilter).n} Tüketimi`;
             eChart.update();
 
             pChart.stop();
             if(mFilter === 'all') {
                 pChart.data.labels = machines.map(m => m.n); 
-                pChart.data.datasets[0].data = machines.map((m, index) => {
-                    let monthlyVariance = 0.85 + ((index % 4) * 0.08) + (Math.sin(index + timeMultiplier) * 0.06);
-                    return Math.floor(m.p * 24 * 30 * timeMultiplier * monthlyVariance);
-                });
+                pChart.data.datasets[0].data = machines.map((m, index) => Math.floor(m.p * 24 * 30 * timeMultiplier * (0.85 + ((index % 4) * 0.08))));
             } else {
                 pChart.data.labels = ['Seçili İstasyon', 'Diğer İstasyonlar'];
                 let otherP = machines.reduce((sum, m) => sum + m.p, 0) - baseP;
-                let variance1 = 0.92 + (Math.cos(timeMultiplier) * 0.05);
-                let variance2 = 1.02 - (Math.cos(timeMultiplier) * 0.03);
-                pChart.data.datasets[0].data = [
-                    Math.floor(baseP * 24 * 30 * timeMultiplier * variance1), 
-                    Math.floor(otherP * 24 * 30 * timeMultiplier * variance2)
-                ];
+                pChart.data.datasets[0].data = [Math.floor(baseP * 24 * 30 * timeMultiplier), Math.floor(otherP * 24 * 30 * timeMultiplier)];
             }
             pChart.update('active');
         }
@@ -1489,82 +1261,54 @@
             let targetMachines = mFilter === 'all' ? machines : machines.filter(m => m.id === mFilter);
 
             for(let i = daysToGenerate; i >= 0; i--) {
-                let d = new Date(today); 
-                d.setDate(d.getDate() - i);
+                let d = new Date(today); d.setDate(d.getDate() - i);
                 let dateStr = d.toISOString().split('T')[0];
                 targetMachines.forEach(m => {
-                    let randP = (m.p * (0.8 + Math.random() * 0.4)).toFixed(1);
-                    let randO = (m.o * (0.9 + Math.random() * 0.1)).toFixed(1);
-                    if(randO > 100) randO = 100;
-                    csv += `${dateStr},${m.n},${randP},${randO}\n`;
+                    csv += `${dateStr},${m.n},${(m.p * (0.8 + Math.random() * 0.4)).toFixed(1)},${(m.o * (0.9 + Math.random() * 0.1)).toFixed(1)}\n`;
                 });
             }
             const b = new Blob([csv], {type:'text/csv;charset=utf-8;'}); 
-            const u = URL.createObjectURL(b); 
-            const a = document.createElement('a'); 
-            a.href = u; 
-            a.download = `MES_Rapor_${val}_Ay_${new Date().toISOString().split('T')[0]}.csv`; 
-            a.click(); 
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(b); a.download = `MES_Rapor_${new Date().toISOString().split('T')[0]}.csv`; a.click(); 
         }
 
+        // KESİNTİSİZ LOCAL KPI SAYICI DÖNGÜSÜ (SERVERLESS SİSTEMİN KALBİ)
         function startCounterLoop() {
             if(simInterval) clearInterval(simInterval);
             simInterval = setInterval(() => { 
                 if(!running) return; 
-                
-                // Fabrika standardında parça artış hızı
                 pCount += 1; 
-                
-                // LocalStorage'a kaydet (PERSISTENCE KALICI VERİ)
                 localStorage.setItem('fotm_pCount', pCount);
                 
                 let activeWO = workOrders.find(wo => wo.status === 'AKTİF ÜRETİM');
                 if(activeWO) {
                     activeWO.produced += 1;
-                    if(Math.random() > 0.992) {
-                        activeWO.defect++;
-                        dCount++;
-                        localStorage.setItem('fotm_dCount', dCount);
-                    }
+                    if(Math.random() > 0.992) { activeWO.defect++; dCount++; localStorage.setItem('fotm_dCount', dCount); }
                     if(activeWO.produced >= activeWO.target) {
                         activeWO.status = 'TAMAMLANDI';
                         activeWO.endTime = new Date().toLocaleTimeString().substr(0,5);
-                        addLog("İş Emri Hedefe Ulaştı ve Tamamlandı: #" + activeWO.id, "green");
+                        addLog("İş Emri Tamamlandı: #" + activeWO.id, "green");
                     }
                 } else {
-                    if(Math.random() > 0.995) {
-                        dCount++;
-                        localStorage.setItem('fotm_dCount', dCount);
-                    }
+                    if(Math.random() > 0.995) { dCount++; localStorage.setItem('fotm_dCount', dCount); }
                 }
                 
-                $('#kpi-p').text(pCount); 
-                $('#kpi-d').text(dCount);
-                updateOeeDisplay();
-                renderWorkOrders();
+                $('#kpi-p').text(pCount); $('#kpi-d').text(dCount);
+                updateOeeDisplay(); renderWorkOrders();
             }, updateSpeed); 
         }
 
-        // BAŞLATMA
         function init() {
-            $('#kpi-p').text(pCount); 
-            $('#kpi-d').text(dCount);
-            
+            $('#kpi-p').text(pCount); $('#kpi-d').text(dCount);
             const mList = $('#machine-list').empty();
             
             machines.forEach((m) => {
-                $('<div class="st-card">')
-                    .attr('id', `card-${m.id}`)
-                    .html(`
-                        <h4 style="color:var(--border);">${m.n}</h4>
-                        <span class="st-online-span" style="color:var(--success); font-size:0.8em; font-weight:900;">● Çevrimiçi</span>
-                        <br><br>
-                        <small class="st-card-oee-text" style="font-weight:700;">OEE: %${m.o}</small>
-                        <br>
-                        <small class="st-card-power-text" style="font-weight:700;">Güç: ${m.p} kW/h</small>
-                    `)
-                    .click(() => openM(m.id))
-                    .appendTo(mList);
+                $('<div class="st-card">').attr('id', `card-${m.id}`).html(`
+                    <h4 style="color:var(--border);">${m.n}</h4>
+                    <span class="st-online-span" style="color:var(--success); font-size:0.8em; font-weight:900;">● Çevrimiçi</span>
+                    <br><br><small class="st-card-oee-text" style="font-weight:700;">OEE: %${m.o}</small>
+                    <br><small class="st-card-power-text" style="font-weight:700;">Güç: ${m.p} kW/h</small>
+                `).click(() => openM(m.id)).appendTo(mList);
             });
 
             startCounterLoop(); 
@@ -1581,10 +1325,9 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels:{boxWidth:12, font:{size:11}} } } }
             });
 
-            updateEnergyChart();
-            updateOeeDisplay();
-            renderWorkOrders();
+            updateEnergyChart(); updateOeeDisplay(); renderWorkOrders();
 
+            // İstasyonların durumunu düzenli güncelleyen arka plan periyodu
             setInterval(() => {
                 if(!running) return;
                 machines.forEach(m => {
@@ -1594,44 +1337,21 @@
                     if(Math.random() > 0.995) m.def += 1; 
                 });
                 updateOeeDisplay();
-            }, 60000);
-
-            try {
-                ws = new WebSocket('wss://meskariyergunu.onrender.com/ws'); 
-                ws.onmessage = (e) => { const d = JSON.parse(e.data); addLog(d.payload.log_message, d.type==='error_event'?'red':'green'); };
-                ws.onclose = () => setTimeout(() => { ws = new WebSocket('wss://meskariyergunu.onrender.com/ws'); }, 5000);
-            } catch(e) { console.log("Canlı veri koptu."); }
-            
-            listCams(); 
+            }, 30000);
         }
 
-        // GLOBAL SCOPE ATAMALARI (Zirvede Buton Tıklama ve Event Hatalarını Tamamen Önler)
-        window.tab = tab;
-        window.editWO = editWO;
-        window.completeWO = completeWO;
-        window.viewWoDetails = viewWoDetails;
-        window.deleteWO = deleteWO;
-        window.goDtStep2 = goDtStep2;
-        window.goDt3 = goDt3;
-        window.startDt = startDt;
-        window.stopDt = stopDt;
-        window.openHistory = openHistory;
-        window.openWoModal = openWoModal;
-        window.closeAllModals = closeAllModals;
-        window.saveWorkOrder = saveWorkOrder;
-        window.openM = openM;
-        window.closeM = closeM;
-        window.toggleChartType = toggleChartType;
-        window.updateEnergyChart = updateEnergyChart;
-        window.exportExcel = exportExcel;
-        window.startCam = startCam;
-        window.stopCam = stopCam;
-        window.login = login;
-        window.clearNotifs = clearNotifs;
+        // GLOBAL BINDINGS
+        window.tab = tab; window.editWO = editWO; window.completeWO = completeWO;
+        window.viewWoDetails = viewWoDetails; window.deleteWO = deleteWO;
+        window.goDtStep2 = goDtStep2; window.goDt3 = goDt3; window.startDt = startDt;
+        window.stopDt = stopDt; window.openWoModal = openWoModal;
+        window.closeAllModals = closeAllModals; window.saveWorkOrder = saveWorkOrder;
+        window.openM = openM; window.closeM = closeM; window.toggleChartType = toggleChartType;
+        window.updateEnergyChart = updateEnergyChart; window.exportExcel = exportExcel;
+        window.login = login; window.clearNotifs = clearNotifs;
 
         $(document).ready(function() {
             setInterval(() => { $('#live-clock').text(new Date().toLocaleTimeString()); }, 1000);
-            
             const mFilter = $('#machine-filter');
             const dtList = $('#dt-st-list');
             
