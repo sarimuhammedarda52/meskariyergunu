@@ -154,6 +154,7 @@
             border-radius: 50%; 
             object-fit: cover; 
             border: 2px solid var(--border); 
+            background-color: #f0f0f0;
         }
 
         /* BİLDİRİM PANELİ */
@@ -493,7 +494,7 @@
     <div id="login-modal">
         <div class="login-box">
             <img src="FOTM.jpg" class="login-logo" alt="Logo">
-            <h1 style="margin-bottom:20px; font-weight:900; font-size:1.8em; color:var(--primary-gray);">FOT-M MES SİSTEMİ</h1>
+            <h1 style="margin-bottom:20px; font-weight:900; font-size:1.8em; color:var(--primary-gray);">FOT-M İMALAT YÜRÜTME SİSTEMİ</h1>
             <input type="text" id="username" class="login-input" placeholder="Kullanıcı Adı">
             <input type="password" id="password" class="login-input" placeholder="Şifre">
             <button class="login-btn" onclick="login()">SİSTEME GİRİŞ YAP</button>
@@ -516,10 +517,11 @@
 
             <div class="header-right">
                 <div style="text-align: right; margin-right: 10px;">
-                    <p id="op-name" style="font-weight:900; font-size: 1.1em;">Kariyer</p>
+                    <p id="op-name" style="font-weight:900; font-size: 1.1em;">Operatör</p>
                     <p id="op-role" style="font-size: 0.75em; color: var(--success); font-weight: bold;">● SİSTEM AKTİF</p>
                 </div>
-                <img src="default.png" id="op-img" class="operator-photo" alt="Operator">
+                <!-- BURASI GÜNCELLENDİ: Varsayılan fotoğraf 11.png oldu -->
+                <img src="11.png" id="op-img" class="operator-photo" alt="Operator">
                 
                 <div class="notif-bell" onclick="$('#notif-panel').fadeToggle()">
                     🔔<span class="notif-badge" id="notif-count">0</span>
@@ -909,6 +911,16 @@
         let pCount = parseInt(localStorage.getItem('fotm_pCount')) || 1420;
         let dCount = parseInt(localStorage.getItem('fotm_dCount')) || 11;
 
+        // BURASI GÜNCELLENDİ: Çevrimdışı Mod İçin Operatör Sözlüğü
+        const localUsers = {
+            "mehmet.c": {"name": "Mehmet Ceran", "photo": "mehmetceran.jpg"},
+            "ilker.k": {"name": "İlker Kurtini", "photo": "ilkerkurtini.jpg"},
+            "arda.s": {"name": "Muhammed Arda Sarı", "photo": "muhammedardasari.jpg"},
+            "emirhan.s": {"name": "Emirhan Şenel", "photo": "emirhansenel.jpg"},
+            "mustafa.d": {"name": "Mustafa Can Demir", "photo": "mustafacandemir.jpg"},
+            "kariyer.k": {"name": "Kariyer", "photo": "1.png"}
+        };
+
         async function fetchWorkOrders() {
             try {
                 const res = await fetch(`${BACKEND_URL}/api/workorders`);
@@ -950,9 +962,21 @@
 
             $('#login-error').hide();
 
+            // Varsayılan Kullanıcı ve Fotoğraf (Senin klasöründeki 11.png)
+            let opName = "Sistem Yöneticisi"; 
+            let opPhoto = "11.png"; 
+
+            // Eğer girilen kullanıcı adı lokal sözlükte varsa verilerini çek
+            if (localUsers[u]) {
+                opName = localUsers[u].name;
+                opPhoto = localUsers[u].photo;
+            } else if (u === "admin") {
+                opName = "Admin";
+            }
+
             try {
                 const controller = new AbortController();
-                setTimeout(() => controller.abort(), 5000); 
+                setTimeout(() => controller.abort(), 3000); 
 
                 const res = await fetch(`${BACKEND_URL}/api/login`, {
                     method: 'POST',
@@ -964,11 +988,19 @@
                 if (!res.ok) throw new Error("Doğrulama hatası");
                 const data = await res.json();
                 isAdmin = (data.role === 'admin' || u.includes("arda") || u.includes("kariyer"));
+                
+                // Eğer Backend'den isim ve fotoğraf gelirse yerelin üstüne yaz
+                if(data.name) opName = data.name;
+                if(data.photo) opPhoto = data.photo;
 
             } catch (e) {
                 isAdmin = (u === "admin" || u === "arda.s");
                 addLog("API Doğrulaması atlandı. Lokal giriş yapıldı.", "orange");
             }
+
+            // GÖRSEL VE İSİM UYGULAMA (Gözükmeme Sorunu Çözüldü)
+            $('#op-name').text(opName);
+            $('#op-img').attr('src', opPhoto);
 
             if(isAdmin) {
                 $('#op-role').text("● PLANLAMA / ADMİN").css('color', '#3b82f6');
@@ -1016,7 +1048,7 @@
             $('#wo-modal-title').text('YENİ İŞ EMRİ OLUŞTUR');
             $('.form-input').val(''); 
             $('#m-wo-client').val('-'); 
-            $('#m-wo-op').val('Muhammed Arda Sarı');
+            $('#m-wo-op').val($('#op-name').text()); 
             $('#m-wo-priority').val('NORMAL');
             $('#m-wo-status').val('BEKLEYEN');
             $('#m-wo-cycle').val('1.5');
@@ -1081,7 +1113,7 @@
             const code = $('#m-wo-code').val().trim().toUpperCase() || '-';
             const name = $('#m-wo-name').val().trim().toUpperCase();
             const client = '-';
-            const op = $('#m-wo-op').val().trim() || 'Muhammed Arda Sarı';
+            const op = $('#m-wo-op').val().trim() || $('#op-name').text();
             const target = parseInt($('#m-wo-target').val()) || 0;
             const priority = $('#m-wo-priority').val();
             const status = $('#m-wo-status').val();
