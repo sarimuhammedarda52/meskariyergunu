@@ -520,7 +520,6 @@
                     <p id="op-name" style="font-weight:900; font-size: 1.1em;">Operatör</p>
                     <p id="op-role" style="font-size: 0.75em; color: var(--success); font-weight: bold;">● SİSTEM AKTİF</p>
                 </div>
-                <!-- BURASI GÜNCELLENDİ: Varsayılan fotoğraf 11.png oldu -->
                 <img src="11.png" id="op-img" class="operator-photo" alt="Operator">
                 
                 <div class="notif-bell" onclick="$('#notif-panel').fadeToggle()">
@@ -860,7 +859,6 @@
         let eChart, pChart;
         let simInterval = null;
 
-        // VERİ KALICILIĞI: LocalStorage & Default Data
         let workOrders = []; 
         
         let defaultWorkOrders = [
@@ -911,7 +909,6 @@
         let pCount = parseInt(localStorage.getItem('fotm_pCount')) || 1420;
         let dCount = parseInt(localStorage.getItem('fotm_dCount')) || 11;
 
-        // BURASI GÜNCELLENDİ: Çevrimdışı Mod İçin Operatör Sözlüğü
         const localUsers = {
             "mehmet.c": {"name": "Mehmet Ceran", "photo": "mehmetceran.jpg"},
             "ilker.k": {"name": "İlker Kurtini", "photo": "ilkerkurtini.jpg"},
@@ -962,11 +959,9 @@
 
             $('#login-error').hide();
 
-            // Varsayılan Kullanıcı ve Fotoğraf (Senin klasöründeki 11.png)
             let opName = "Sistem Yöneticisi"; 
             let opPhoto = "11.png"; 
 
-            // Eğer girilen kullanıcı adı lokal sözlükte varsa verilerini çek
             if (localUsers[u]) {
                 opName = localUsers[u].name;
                 opPhoto = localUsers[u].photo;
@@ -989,7 +984,6 @@
                 const data = await res.json();
                 isAdmin = (data.role === 'admin' || u.includes("arda") || u.includes("kariyer"));
                 
-                // Eğer Backend'den isim ve fotoğraf gelirse yerelin üstüne yaz
                 if(data.name) opName = data.name;
                 if(data.photo) opPhoto = data.photo;
 
@@ -998,15 +992,13 @@
                 addLog("API Doğrulaması atlandı. Lokal giriş yapıldı.", "orange");
             }
 
-            // GÖRSEL VE İSİM UYGULAMA (Gözükmeme Sorunu Çözüldü)
             $('#op-name').text(opName);
             $('#op-img').attr('src', opPhoto);
 
+            // BURASI GÜNCELLENDİ: Rol ismi yazdırmıyoruz, sadece buton kontrolü yapıyoruz.
             if(isAdmin) {
-                $('#op-role').text("● PLANLAMA / ADMİN").css('color', '#3b82f6');
                 $('#btn-new-wo').show(); 
             } else {
-                $('#op-role').text("● SAHA OPERATÖRÜ").css('color', 'var(--success)');
                 $('#btn-new-wo').hide(); 
             }
 
