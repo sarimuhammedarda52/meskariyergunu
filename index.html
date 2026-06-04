@@ -517,7 +517,7 @@
             <div class="header-right">
                 <div style="text-align: right; margin-right: 10px;">
                     <p id="op-name" style="font-weight:900; font-size: 1.1em;">Kariyer</p>
-                    <p style="font-size: 0.75em; color: var(--success); font-weight: bold;">● SİSTEM AKTİF</p>
+                    <p id="op-role" style="font-size: 0.75em; color: var(--success); font-weight: bold;">● SİSTEM AKTİF</p>
                 </div>
                 <img src="default.png" id="op-img" class="operator-photo" alt="Operator">
                 
@@ -574,7 +574,7 @@
                 <div class="card">
                     <h3>
                         AKTİF VE BEKLEYEN İŞ EMİRLERİ
-                        <button onclick="openWoModal()" style="background:var(--success); color:white; border:none; padding:8px 15px; border-radius:6px; font-weight:900; font-size:0.8em; cursor:pointer;">+ YENİ İŞ EMRİ</button>
+                        <button id="btn-new-wo" onclick="openWoModal()" style="display:none; background:var(--success); color:white; border:none; padding:8px 15px; border-radius:6px; font-weight:900; font-size:0.8em; cursor:pointer;">+ YENİ İŞ EMRİ</button>
                     </h3>
                     <div class="table-container">
                         <table>
@@ -751,7 +751,7 @@
             </div>
             <div style="flex:1;">
                 <label style="font-weight:bold; display:block; margin-bottom:5px;">Operatör:</label>
-                <input type="text" id="m-wo-op" class="form-input" value="Muhammed Arda Sarı">
+                <input type="text" id="m-wo-op" class="form-input" value="Sistem Operatörü">
             </div>
         </div>
         
@@ -838,9 +838,8 @@
     </div>
 
     <script>
-        // BACKEND URL TANIMLAMASI
         const BACKEND_URL = "https://fotm-backend.vercel.app";
-
+        let isAdmin = false; 
         let updateSpeed = 6000; 
         let running = true;
         let notifCount = 0;
@@ -859,51 +858,36 @@
         let eChart, pChart;
         let simInterval = null;
 
-        let pCount = parseInt(localStorage.getItem('fotm_pCount')) || 1420;
-        let dCount = parseInt(localStorage.getItem('fotm_dCount')) || 11;
+        // VERİ KALICILIĞI: LocalStorage & Default Data
+        let workOrders = []; 
+        
+        let defaultWorkOrders = [
+            {id: 7801, code: 'P-101', name: 'Ham Çelik Sac Rulosu Kesimi', client: 'İç Üretim', priority: 'NORMAL', status: 'TAMAMLANDI', time: '08:00', endTime: '09:30', target: 2000, produced: 2000, defect: 5, op: 'Muhammed Arda Sarı', cycle: '1.2'},
+            {id: 7802, code: 'S-440', name: 'Preslenmiş Kapı Panelleri', client: 'İç Üretim', priority: 'NORMAL', status: 'TAMAMLANDI', time: '09:45', endTime: '11:15', target: 500, produced: 500, defect: 2, op: 'Emirhan Şenel', cycle: '1.8'},
+            {id: 7803, code: 'K-202', name: 'Çamurluk Panelleri Presleme', client: 'İç Üretim', priority: 'NORMAL', status: 'TAMAMLANDI', time: '11:30', endTime: '13:00', target: 500, produced: 500, defect: 4, op: 'Mehmet Ceran', cycle: '2.0'},
+            {id: 7804, code: 'M-110', name: 'Kaynaklı Araç Şasisi (Beyaz Gövde)', client: 'İç Üretim', priority: 'ACİL', status: 'AKTİF ÜRETİM', time: '13:30', endTime: '-', target: 300, produced: 145, defect: 1, op: 'Mustafa Can Demir', cycle: '2.5'},
+            {id: 7805, code: 'T-303', name: 'Kataforez ve Ön Boya İşlemi', client: 'İç Üretim', priority: 'ACİL', status: 'BEKLEYEN', time: '16:00', endTime: '-', target: 300, produced: 0, defect: 0, op: 'İlker Kurtini', cycle: '1.5'},
+            {id: 7806, code: 'T-304', name: 'Boyanmış ve Fırınlanmış Araç Gövdesi', client: 'İç Üretim', priority: 'NORMAL', status: 'BEKLEYEN', time: '18:00', endTime: '-', target: 300, produced: 0, defect: 0, op: 'Serkan Mutlu', cycle: '1.1'},
+            {id: 7807, code: 'Q-305', name: 'Boya Yüzey Görsel Kontrol ve Onay', client: 'İç Üretim', priority: 'NORMAL', status: 'BEKLEYEN', time: '19:30', endTime: '-', target: 300, produced: 0, defect: 0, op: 'Ecrin İlkim Yılmaz', cycle: '1.2'},
+            {id: 7808, code: 'S-202', name: 'Ham Alüminyum Motor Bloğu Dökümü', client: 'İç Üretim', priority: 'NORMAL', status: 'TAMAMLANDI', time: '07:00', endTime: '10:30', target: 800, produced: 800, defect: 12, op: 'Hüseyin Çiftçi', cycle: '1.5'},
+            {id: 7809, code: 'C-105', name: 'CNC İşlemeli Motor Bloğu', client: 'İç Üretim', priority: 'ACİL', status: 'AKTİF ÜRETİM', time: '11:00', endTime: '-', target: 800, produced: 420, defect: 3, op: 'Ayberk Batır', cycle: '1.8'},
+            {id: 7810, code: 'D-401', name: 'Dövme Çelik Krank Mili Üretimi', client: 'İç Üretim', priority: 'NORMAL', status: 'AKTİF ÜRETİM', time: '11:30', endTime: '-', target: 800, produced: 390, defect: 2, op: 'Mehmet Torun', cycle: '1.6'},
+            {id: 7811, code: 'P-502', name: 'Piston ve Biyel Kolu Montajı', client: 'İç Üretim', priority: 'NORMAL', status: 'BEKLEYEN', time: '14:00', endTime: '-', target: 800, produced: 0, defect: 0, op: 'Muhammed Emin Yıldırım', cycle: '0.9'},
+            {id: 7812, code: 'V-601', name: 'Silindir Kapağı ve Valf Grubu', client: 'İç Üretim', priority: 'NORMAL', status: 'BEKLEYEN', time: '14:30', endTime: '-', target: 800, produced: 0, defect: 0, op: 'Anıl Harmanlı', cycle: '1.4'},
+            {id: 7813, code: 'G-305', name: 'Montajlı Motor Alt Ünitesi', client: 'İç Üretim', priority: 'ACİL', status: 'BEKLEYEN', time: '16:30', endTime: '-', target: 800, produced: 0, defect: 0, op: 'Mert Başak', cycle: '2.2'},
+            {id: 7814, code: 'Q-306', name: 'Tamamlanmış Motor Ünitesi (Soğuk Test)', client: 'İç Üretim', priority: 'ACİL', status: 'BEKLEYEN', time: '18:30', endTime: '-', target: 800, produced: 0, defect: 0, op: 'Semanur Kuvam', cycle: '2.5'},
+            {id: 7815, code: 'Z-101', name: 'Otomatik Şanzıman Gövdesi Dökümü', client: 'İç Üretim', priority: 'NORMAL', status: 'TAMAMLANDI', time: '06:00', endTime: '09:00', target: 600, produced: 600, defect: 8, op: 'Muhammed Enes Bıyık', cycle: '1.3'},
+            {id: 7816, code: 'Z-102', name: 'İşlenmiş Şanzıman Dişlileri', client: 'İç Üretim', priority: 'NORMAL', status: 'AKTİF ÜRETİM', time: '09:30', endTime: '-', target: 600, produced: 315, defect: 4, op: 'Çınar Aktaş', cycle: '1.1'},
+            {id: 7817, code: 'Z-103', name: 'Tamamlanmış Otomatik Şanzıman Ünitesi', client: 'İç Üretim', priority: 'ACİL', status: 'BEKLEYEN', time: '13:00', endTime: '-', target: 600, produced: 0, defect: 0, op: 'Yakup Turan', cycle: '2.0'},
+            {id: 7818, code: 'O-900', name: 'Güç Aktarma Organı Birleşimi (Motor+Şanzıman)', client: 'İç Üretim', priority: 'ACİL', status: 'BEKLEYEN', time: '20:00', endTime: '-', target: 600, produced: 0, defect: 0, op: 'Ahmet Can Fındık', cycle: '3.5'},
+            {id: 7819, code: 'R-701', name: 'Ana Kablo Tesisatı (Harness) Montajı', client: 'İç Üretim', priority: 'NORMAL', status: 'TAMAMLANDI', time: '05:20', endTime: '10:45', target: 400, produced: 400, defect: 0, op: 'Ebrar Oturak', cycle: '1.4'},
+            {id: 7820, code: 'H-902', name: 'Ön Konsol ve Gösterge Paneli Alt Montajı', client: 'İç Üretim', priority: 'NORMAL', status: 'AKTİF ÜRETİM', time: '11:00', endTime: '-', target: 400, produced: 120, defect: 1, op: 'Rabia Tepe', cycle: '3.0'},
+            {id: 7821, code: 'I-660', name: 'İç Trim ve Koltukların Montajı', client: 'İç Üretim', priority: 'NORMAL', status: 'BEKLEYEN', time: '13:30', endTime: '-', target: 300, produced: 0, defect: 0, op: 'Medine Akkaş', cycle: '3.2'},
+            {id: 7822, code: 'E-550', name: 'Şasi ve Motor Birleşimi (Evlilik) - Otonom İstasyon', client: 'İç Üretim', priority: 'ACİL', status: 'BEKLEYEN', time: '21:30', endTime: '-', target: 300, produced: 0, defect: 0, op: 'Kariyer', cycle: '4.5'},
+            {id: 7823, code: 'Q-998', name: 'Araç İçi Elektronik ve Sensör Sistem Testleri', client: 'Müşteri Siparişi', priority: 'NORMAL', status: 'BEKLEYEN', time: '22:30', endTime: '-', target: 300, produced: 0, defect: 0, op: 'Rümeysa Doğancal', cycle: '2.5'},
+            {id: 7824, code: 'Q-999', name: 'Son Kalite Kontrol ve VIN Ataması', client: 'Müşteri Siparişi', priority: 'ACİL', status: 'BEKLEYEN', time: '23:45', endTime: '-', target: 300, produced: 0, defect: 0, op: 'Emel Dalga', cycle: '5.0'}
+        ];
 
-        let workOrders = [
-            const isEmirleri = [
-    // --- GÖVDE VE ŞASİ GRUBU (Ağır Sanayi - Metal İşleme) ---
-    {id: 7801, code: 'P-101', name: 'Ham Çelik Sac Rulosu Kesimi', client: 'İç Üretim', priority: 'NORMAL', status: 'TAMAMLANDI', time: '08:00', endTime: '09:30', target: 2000, produced: 2000, defect: 5, op: 'Muhammed Arda Sarı', cycle: '1.2'},
-    {id: 7802, code: 'S-440', name: 'Preslenmiş Kapı Panelleri', client: 'İç Üretim', priority: 'NORMAL', status: 'TAMAMLANDI', time: '09:45', endTime: '11:15', target: 500, produced: 500, defect: 2, op: 'Emirhan Şenel', cycle: '1.8'},
-    {id: 7803, code: 'K-202', name: 'Çamurluk Panelleri Presleme', client: 'İç Üretim', priority: 'NORMAL', status: 'TAMAMLANDI', time: '11:30', endTime: '13:00', target: 500, produced: 500, defect: 4, op: 'Mehmet Ceran', cycle: '2.0'},
-    {id: 7804, code: 'M-110', name: 'Kaynaklı Araç Şasisi (Beyaz Gövde)', client: 'İç Üretim', priority: 'ACİL', status: 'AKTİF ÜRETİM', time: '13:30', endTime: '-', target: 300, produced: 145, defect: 1, op: 'Mustafa Can Demir', cycle: '2.5'},
-    {id: 7805, code: 'T-303', name: 'Kataforez ve Ön Boya İşlemi', client: 'İç Üretim', priority: 'ACİL', status: 'BEKLEYEN', time: '16:00', endTime: '-', target: 300, produced: 0, defect: 0, op: 'İlker Kurtini', cycle: '1.5'},
-    {id: 7806, code: 'T-304', name: 'Boyanmış ve Fırınlanmış Araç Gövdesi', client: 'İç Üretim', priority: 'NORMAL', status: 'BEKLEYEN', time: '18:00', endTime: '-', target: 300, produced: 0, defect: 0, op: 'Serkan Mutlu', cycle: '1.1'},
-    
-    // --- BOYA KALİTE KONTROL (Hassas İnceleme) ---
-    {id: 7807, code: 'Q-305', name: 'Boya Yüzey Görsel Kontrol ve Onay', client: 'İç Üretim', priority: 'NORMAL', status: 'BEKLEYEN', time: '19:30', endTime: '-', target: 300, produced: 0, defect: 0, op: 'Ecrin İlkim Yılmaz', cycle: '1.2'},
-
-    // --- MOTOR ÜRETİM GRUBU (Talaşlı İmalat ve Ağır Montaj) ---
-    {id: 7808, code: 'S-202', name: 'Ham Alüminyum Motor Bloğu Dökümü', client: 'İç Üretim', priority: 'NORMAL', status: 'TAMAMLANDI', time: '07:00', endTime: '10:30', target: 800, produced: 800, defect: 12, op: 'Hüseyin Çiftçi', cycle: '1.5'},
-    {id: 7809, code: 'C-105', name: 'CNC İşlemeli Motor Bloğu', client: 'İç Üretim', priority: 'ACİL', status: 'AKTİF ÜRETİM', time: '11:00', endTime: '-', target: 800, produced: 420, defect: 3, op: 'Ayberk Batır', cycle: '1.8'},
-    {id: 7810, code: 'D-401', name: 'Dövme Çelik Krank Mili Üretimi', client: 'İç Üretim', priority: 'NORMAL', status: 'AKTİF ÜRETİM', time: '11:30', endTime: '-', target: 800, produced: 390, defect: 2, op: 'Mehmet Torun', cycle: '1.6'},
-    {id: 7811, code: 'P-502', name: 'Piston ve Biyel Kolu Montajı', client: 'İç Üretim', priority: 'NORMAL', status: 'BEKLEYEN', time: '14:00', endTime: '-', target: 800, produced: 0, defect: 0, op: 'Muhammed Emin Yıldırım', cycle: '0.9'},
-    {id: 7812, code: 'V-601', name: 'Silindir Kapağı ve Valf Grubu', client: 'İç Üretim', priority: 'NORMAL', status: 'BEKLEYEN', time: '14:30', endTime: '-', target: 800, produced: 0, defect: 0, op: 'Anıl Harmanlı', cycle: '1.4'},
-    {id: 7813, code: 'G-305', name: 'Montajlı Motor Alt Ünitesi', client: 'İç Üretim', priority: 'ACİL', status: 'BEKLEYEN', time: '16:30', endTime: '-', target: 800, produced: 0, defect: 0, op: 'Mert Başak', cycle: '2.2'},
-    
-    // --- MOTOR TEST (Kalite Kontrol) ---
-    {id: 7814, code: 'Q-306', name: 'Tamamlanmış Motor Ünitesi (Soğuk Test)', client: 'İç Üretim', priority: 'ACİL', status: 'BEKLEYEN', time: '18:30', endTime: '-', target: 800, produced: 0, defect: 0, op: 'Semanur Kuvam', cycle: '2.5'},
-
-    // --- ŞANZIMAN VE GÜÇ AKTARMA (Ağır İşlem) ---
-    {id: 7815, code: 'Z-101', name: 'Otomatik Şanzıman Gövdesi Dökümü', client: 'İç Üretim', priority: 'NORMAL', status: 'TAMAMLANDI', time: '06:00', endTime: '09:00', target: 600, produced: 600, defect: 8, op: 'Muhammed Enes Bıyık', cycle: '1.3'},
-    {id: 7816, code: 'Z-102', name: 'İşlenmiş Şanzıman Dişlileri', client: 'İç Üretim', priority: 'NORMAL', status: 'AKTİF ÜRETİM', time: '09:30', endTime: '-', target: 600, produced: 315, defect: 4, op: 'Çınar Aktaş', cycle: '1.1'},
-    {id: 7817, code: 'Z-103', name: 'Tamamlanmış Otomatik Şanzıman Ünitesi', client: 'İç Üretim', priority: 'ACİL', status: 'BEKLEYEN', time: '13:00', endTime: '-', target: 600, produced: 0, defect: 0, op: 'Yakup Turan', cycle: '2.0'},
-    {id: 7818, code: 'O-900', name: 'Güç Aktarma Organı Birleşimi (Motor+Şanzıman)', client: 'İç Üretim', priority: 'ACİL', status: 'BEKLEYEN', time: '20:00', endTime: '-', target: 600, produced: 0, defect: 0, op: 'Ahmet Can Fındık', cycle: '3.5'},
-
-    // --- İÇ TRİM, ELEKTRONİK VE HAFİF MONTAJ (Hassas İşçilik) ---
-    {id: 7819, code: 'R-701', name: 'Ana Kablo Tesisatı (Harness) Montajı', client: 'İç Üretim', priority: 'NORMAL', status: 'TAMAMLANDI', time: '05:20', endTime: '10:45', target: 400, produced: 400, defect: 0, op: 'Ebrar Oturak', cycle: '1.4'},
-    {id: 7820, code: 'H-902', name: 'Ön Konsol ve Gösterge Paneli Alt Montajı', client: 'İç Üretim', priority: 'NORMAL', status: 'AKTİF ÜRETİM', time: '11:00', endTime: '-', target: 400, produced: 120, defect: 1, op: 'Rabia Tepe', cycle: '3.0'},
-    {id: 7821, code: 'I-660', name: 'İç Trim ve Koltukların Montajı', client: 'İç Üretim', priority: 'NORMAL', status: 'BEKLEYEN', time: '13:30', endTime: '-', target: 300, produced: 0, defect: 0, op: 'Medine Akkaş', cycle: '3.2'},
-
-    // --- FİNAL MONTAJ VE OTONOM SİSTEMLER ---
-    {id: 7822, code: 'E-550', name: 'Şasi ve Motor Birleşimi (Evlilik) - Otonom İstasyon', client: 'İç Üretim', priority: 'ACİL', status: 'BEKLEYEN', time: '21:30', endTime: '-', target: 300, produced: 0, defect: 0, op: 'Kariyer', cycle: '4.5'},
-
-    // --- FİNAL ELEKTRONİK TEST VE SON KALİTE KONTROL ---
-    {id: 7823, code: 'Q-998', name: 'Araç İçi Elektronik ve Sensör Sistem Testleri', client: 'Müşteri Siparişi', priority: 'NORMAL', status: 'BEKLEYEN', time: '22:30', endTime: '-', target: 300, produced: 0, defect: 0, op: 'Rümeysa Doğancal', cycle: '2.5'},
-    {id: 7824, code: 'Q-999', name: 'Son Kalite Kontrol ve VIN Ataması', client: 'Müşteri Siparişi', priority: 'ACİL', status: 'BEKLEYEN', time: '23:45', endTime: '-', target: 300, produced: 0, defect: 0, op: 'Emel Dalga', cycle: '5.0'}
-];
         let machines = [
             {id:'M1', n:'Pres 1', o:88, p:42, t: 65, prod: 1520, def: 12, uptime: '6s 45d'},
             {id:'M2', n:'Montaj A', o:92, p:12, t: 40, prod: 2100, def: 5, uptime: '7s 10d'},
@@ -922,7 +906,39 @@
             {id:'M15', n:'Fırın 2', o:75, p:235, t: 185, prod: 580, def: 30, uptime: '4s 30d'}
         ];
 
-        // HTTP SERVERLESS LOGIN
+        let pCount = parseInt(localStorage.getItem('fotm_pCount')) || 1420;
+        let dCount = parseInt(localStorage.getItem('fotm_dCount')) || 11;
+
+        async function fetchWorkOrders() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/workorders`);
+                if (!res.ok) throw new Error("API Henüz Hazır Değil");
+                workOrders = await res.json();
+                addLog("İş Emirleri veritabanından çekildi.", "green");
+            } catch (error) {
+                console.warn("Backend API bulunamadı, LocalStorage kullanılıyor.");
+                const localData = localStorage.getItem('fotm_isEmirleri');
+                if (localData) {
+                    workOrders = JSON.parse(localData);
+                } else {
+                    workOrders = defaultWorkOrders;
+                    syncData();
+                }
+            }
+            renderWorkOrders();
+        }
+
+        async function syncData() {
+            localStorage.setItem('fotm_isEmirleri', JSON.stringify(workOrders));
+            try {
+                await fetch(`${BACKEND_URL}/api/workorders/sync`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(workOrders)
+                });
+            } catch(e) { }
+        }
+
         async function login() {
             const u = $('#username').val().toLowerCase().trim();
             const p = $('#password').val().trim();
@@ -936,7 +952,7 @@
 
             try {
                 const controller = new AbortController();
-                setTimeout(() => controller.abort(), 8000); 
+                setTimeout(() => controller.abort(), 5000); 
 
                 const res = await fetch(`${BACKEND_URL}/api/login`, {
                     method: 'POST',
@@ -946,24 +962,26 @@
                 });
 
                 if (!res.ok) throw new Error("Doğrulama hatası");
-
                 const data = await res.json();
-
-                $('#login-modal').fadeOut();
-                $('#main-dashboard').fadeIn();
-                $('#op-name').text(data.name || "Muhammed Arda Sarı");
-
-                if (data.photo) $('#op-img').attr('src', data.photo);
-                init();
+                isAdmin = (data.role === 'admin' || u.includes("arda") || u.includes("kariyer"));
 
             } catch (e) {
-                console.log("Serverless uyanma veya haberleşme sorunu, yerel moda geçiliyor:", e);
-                $('#login-modal').fadeOut();
-                $('#main-dashboard').fadeIn();
-                $('#op-name').text("Muhammed Arda Sarı");
-                init();
-                addLog("Sunucu bağlantısı doğrulanamadı. Kesintisiz yerel mod aktif.", "orange");
+                isAdmin = (u === "admin" || u === "arda.s");
+                addLog("API Doğrulaması atlandı. Lokal giriş yapıldı.", "orange");
             }
+
+            if(isAdmin) {
+                $('#op-role').text("● PLANLAMA / ADMİN").css('color', '#3b82f6');
+                $('#btn-new-wo').show(); 
+            } else {
+                $('#op-role').text("● SAHA OPERATÖRÜ").css('color', 'var(--success)');
+                $('#btn-new-wo').hide(); 
+            }
+
+            $('#login-modal').fadeOut();
+            $('#main-dashboard').fadeIn();
+            
+            init(); 
         }
 
         function addLog(message, color = "black") {
@@ -1027,6 +1045,7 @@
                 wo.status = 'TAMAMLANDI';
                 wo.endTime = new Date().toLocaleTimeString().substr(0,5);
                 addLog("İş Emri Tamamlandı: #" + id, "green");
+                syncData();
                 renderWorkOrders();
             }
         }
@@ -1053,6 +1072,7 @@
             if(confirm("Bu iş emrini listeden silmek istediğinize emin misiniz?")) {
                 workOrders = workOrders.filter(x => x.id !== id);
                 addLog("İş Emri #" + id + " silindi.", "orange");
+                syncData(); 
                 renderWorkOrders();
             }
         }
@@ -1094,6 +1114,7 @@
             }
             
             closeAllModals();
+            syncData(); 
             renderWorkOrders();
         }
 
@@ -1301,7 +1322,6 @@
             a.href = URL.createObjectURL(b); a.download = `MES_Rapor_${new Date().toISOString().split('T')[0]}.csv`; a.click(); 
         }
 
-        // KESİNTİSİZ LOCAL KPI SAYICI DÖNGÜSÜ
         function startCounterLoop() {
             if(simInterval) clearInterval(simInterval);
             simInterval = setInterval(() => { 
@@ -1317,6 +1337,7 @@
                         activeWO.status = 'TAMAMLANDI';
                         activeWO.endTime = new Date().toLocaleTimeString().substr(0,5);
                         addLog("İş Emri Tamamlandı: #" + activeWO.id, "green");
+                        syncData();
                     }
                 } else {
                     if(Math.random() > 0.995) { dCount++; localStorage.setItem('fotm_dCount', dCount); }
@@ -1329,8 +1350,8 @@
 
         function init() {
             $('#kpi-p').text(pCount); $('#kpi-d').text(dCount);
-            const mList = $('#machine-list').empty();
             
+            const mList = $('#machine-list').empty();
             machines.forEach((m) => {
                 $('<div class="st-card">').attr('id', `card-${m.id}`).html(`
                     <h4 style="color:var(--border);">${m.n}</h4>
@@ -1339,6 +1360,8 @@
                     <br><small class="st-card-power-text" style="font-weight:700;">Güç: ${m.p} kW/h</small>
                 `).click(() => openM(m.id)).appendTo(mList);
             });
+
+            fetchWorkOrders();
 
             startCounterLoop(); 
 
@@ -1368,7 +1391,6 @@
             }, 30000);
         }
 
-        // GLOBAL BINDINGS
         window.tab = tab; window.editWO = editWO; window.completeWO = completeWO;
         window.viewWoDetails = viewWoDetails; window.deleteWO = deleteWO;
         window.goDtStep2 = goDtStep2; window.goDt3 = goDt3; window.startDt = startDt;
@@ -1379,7 +1401,6 @@
         window.login = login; window.clearNotifs = clearNotifs;
 
         $(document).ready(function() {
-            // Şifre ekranında Enter tuşu dinlemesi aktif edildi
             $('#username, #password').keypress(function(e) {
                 if(e.which == 13) {
                     login();
